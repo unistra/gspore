@@ -112,9 +112,13 @@ class Method {
 		environ['QUERY_STRING']=queryString
 		environ['spore.params']=buildParams(reqParams)
 		environ['spore.payload']=buildPayload(reqParams)
-		/*rather not idiomatic breakable loop
-		 * that call middlewares. Breaks if a response
-		 * is found.
+		
+		/**rather not idiomatic breakable loop
+		 * that call middlewares. Breaks if a Response
+		 * is found. Can modify any of the keys and values
+		 * of the request's base environment or create new
+		 * ones, via middleware logic and store callbacks
+		 * intended on modifying the response
 		 * */
 		delegate.middlewares.find{condition,middleware->
 
@@ -123,10 +127,6 @@ class Method {
 			//If the condition was written in Java
 			if (condition.class == java.lang.reflect.Method){
 				def declaringClass = condition.getDeclaringClass()
-				//ici c'est pas super safe, ça part un peu de l'hypothèse
-				//que la declaringClass prend pour constructeur ça [:]
-				//ceci dit il ne devrait pas y avoir de Middleware.condition
-				//qui ne soient pas comme ça.
 				Object obj = declaringClass.newInstance([:])
 				if (condition.invoke(obj,environ)){
 					callback =	middleware.call(environ)
@@ -158,12 +158,31 @@ class Method {
 			/**pass control to next middleware*/
 			return false
 		}
-
-
-		//From here environ is not modified anymore
-		//that's where missing
-		//or exceeding parameters
-		//errors can be raised.
+		// storedCallbacks
+		// bon mec faut que tu décides où ça écrit les storedCallbacks
+		
+		 storedCallbacks.reverseEach{
+		 				println it.class
+						 it.properties.each{propName,propVal->
+							 println "$propName : $propVal"
+						 }
+						 if (it.class==java.lang.reflect.Method){
+							 def declaringClass = it.getDeclaringClass()
+							
+							 Object obj = declaringClass.newInstance([:])
+							 it.invoke(obj, environ)
+							 println  it.invoke(obj, environ)
+						 }else{
+						 
+						 }
+					 //	realRet?realRet+=it():(realRet=it())
+		 
+					 }
+		/**From here environ is not modified anymore
+		*that's where missing
+		*or exceeding parameters
+		*errors can be raised.
+		**/
 		required_params.each{
 			if (!reqParams.containsKey(it) &&  ! environ['spore.params']){
 				requiredParamsMissing+=it
@@ -176,9 +195,6 @@ class Method {
 			!it.empty?errors+=it:''
 		}
 		// effective processing of the request
-		//donc là tu dois ajouter une loop qui réécrit
-		//le truc qui build la request
-		//et le truc qui build la réponse
 		if (errors.size()==0 && noRequest==false){
 			//là en l'état 
 			//base_url,method, content.type
@@ -213,11 +229,7 @@ class Method {
 
 			//ça mec tu dois le déplacer dans le bloc au dessus
 			def realRet
-			storedCallbacks.reverseEach{
-
-				realRet?realRet+=it():(realRet=it())
-
-			}
+			
 		}
 		if (!requiredParamsMissing.empty){
 			requiredParamsMissing.each{
@@ -227,7 +239,14 @@ class Method {
 		}
 		return [ret:ret,environ:environ]//test purpose
 	}
-
+	/**Transforms the raw path still
+	 * containing placeHolders
+	 * with matching values found 
+	 * in the effective method call 
+	 * parameters
+	 * @param req the effective request
+	 * @return the corrected path
+	 */
 	def placeHoldersReplacer(req){
 		Map queryString = req
 		String corrected=""
@@ -279,7 +298,6 @@ class Method {
 			param(k)
 		}
 	}
-
 	/**For each effective request parameter, checks if it is registered under 
 	 * optional or required params
 	 */
@@ -295,11 +313,23 @@ class Method {
 		}
 		param && param!="" && params.contains(param)
 	}
+	/**
+	 * @return a content-type
+	 */
 	def contentTypesNormalizer(){
 		def normalized
 		def format=formats?:global_formats
 		normalized=contentTypes[format.class==java.lang.String?format.toUpperCase():format[0].toUpperCase()]
 	}
+	/**
+	 * @return in this order
+	 * the content-type specified
+	 * in the environ (so that if it has
+	 * been modified by whatever middleware,
+	 * it is taken in account, the specific content type
+	 * for this method, or would it be missing, the 
+	 * global_format whic is inherited from the spore.
+	 */
 	def contentTypesNormalizer(args){
 		def normalized
 		def format=args['formats']?:formats?:global_formats

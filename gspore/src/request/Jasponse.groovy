@@ -1,5 +1,0 @@
-package request
-
-class Jasponse {
-
-}
