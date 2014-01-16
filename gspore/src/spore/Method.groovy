@@ -25,8 +25,6 @@ import request.Response
 
 class Method {
 	static contentTypes = ['JSON':JSON,'TEXT':TEXT,'XML':XML,"HTML":HTML,"URLENC":URLENC,"BINARY":BINARY]
-	//ça, ça peut pas vraiment marcher, il faut que tu choppes snapshot 0.7,
-	//dedans il y a PATCH
 	static methods = ["GET":GET,"POST":POST,"PUT":PUT,"PATCH":PATCH]
 
 	HTTPBuilder builder = new HTTPBuilder();
@@ -120,6 +118,10 @@ class Method {
 		 * ones, via middleware logic and store callbacks
 		 * intended on modifying the response
 		 * */
+		println delegate.middlewares.each(){k,v->
+			println "closure"+k
+			println "middleware"+v
+		}
 		delegate.middlewares.find{condition,middleware->
 
 			def callback
@@ -129,6 +131,7 @@ class Method {
 				def declaringClass = condition.getDeclaringClass()
 				Object obj = declaringClass.newInstance([:])
 				if (condition.invoke(obj,environ)){
+					println "OUUUUUUUUUUUUUUUUUUUUUUUUUUUH3"+ obj
 					callback =	middleware.call(environ)
 				}
 			}
@@ -143,6 +146,7 @@ class Method {
 			/**break loop
 			 */
 			if (callback in Response){
+				println "OUAIS, OUAIS"
 				noRequest=true
 				return true
 
@@ -158,27 +162,28 @@ class Method {
 			/**pass control to next middleware*/
 			return false
 		}
-		// storedCallbacks
-		// bon mec faut que tu décides où ça écrit les storedCallbacks
 		
+		/**Resolution of the stored callbacks
+		 * in reverse order.
+		 */
 		 storedCallbacks.reverseEach{
-		 				println it.class
+			 println  it
 						 it.properties.each{propName,propVal->
-							 println "$propName : $propVal"
+							 //println "$propName : $propVal"
 						 }
 						 if (it.class==java.lang.reflect.Method){
 							 def declaringClass = it.getDeclaringClass()
-							
+							println declaringClass
 							 Object obj = declaringClass.newInstance([:])
 							 it.invoke(obj, environ)
-							 println  it.invoke(obj, environ)
+							 println "wwwwwwwwwwwwwwwwoooooooo"+ it.invoke(obj, environ)
 						 }else{
-						 
+						 	it()
 						 }
-					 //	realRet?realRet+=it():(realRet=it())
-		 
 					 }
-		/**From here environ is not modified anymore
+		 //	realRet?realRet+=it():(realRet=it())
+		/**From here environ is not modified
+		*anymore
 		*that's where missing
 		*or exceeding parameters
 		*errors can be raised.
@@ -204,11 +209,17 @@ class Method {
 			//spore.payload
 			//PUIS
 			//
-			builder.request(base_url,methods[method],contentTypesNormalizer()) {
+			println "et là c'est vide mec"+environ["spore.headers"]
+			builder.request(base_url,methods[method],contentTypesNormalizer(environ)) {
 				uri.path = finalPath
 				uri.query = queryString
+				environ["spore.headers"].each{k,v->
+					println "ouais"+k
+					println "bon"+v
+					headers."$k"="$v"
+				}
 				headers.'User-Agent' = 'Satanux/5.0'
-				headers.Accept=contentTypesNormalizer()
+				headers.Accept=contentTypesNormalizer(environ)
 
 				if (["POST", "PUT", "PATCH"].contains(request.method)){
 					send contentTypesNormalizer(),environ['spore.payload']
@@ -219,6 +230,18 @@ class Method {
 					ret += json
 					ret+=" : "
 					ret+=statusCode
+					println  "ouais c'est quoi encore le délire ici?"+json
+					resp.properties.each{k,v->
+						//println k
+						//println v
+						
+					}
+					json.properties.each{k,v->
+						println k
+						println v
+						
+					}
+					println  "ouais c'est quoi encore le délire ici?"+json.class
 				}
 
 				response.failure ={resp->
@@ -315,6 +338,7 @@ class Method {
 	}
 	/**
 	 * @return a content-type
+	 * tje
 	 */
 	def contentTypesNormalizer(){
 		def normalized
@@ -326,13 +350,13 @@ class Method {
 	 * the content-type specified
 	 * in the environ (so that if it has
 	 * been modified by whatever middleware,
-	 * it is taken in account, the specific content type
+	 * it is taken in account), the specific content type
 	 * for this method, or would it be missing, the 
-	 * global_format whic is inherited from the spore.
+	 * global_format which is inherited from the spore.
 	 */
 	def contentTypesNormalizer(args){
 		def normalized
-		def format=args['formats']?:formats?:global_formats
-		normalized=contentTypes[format.class==java.lang.String?format.toUpperCase():format[0].toUpperCase()]
+		def format=args['spore.format']?:formats?:global_formats
+		normalized=format.class==groovyx.net.http.ContentType?format:contentTypes[format.class=java.lang.String?format.toUpperCase():format[0].toUpperCase()]
 	}
 }

@@ -183,7 +183,6 @@ class Spore {
 	 * @return
 	 */
 	def enableIf(middleware,args,java.lang.reflect.Method clos){
-		
 		def instance = middleware.newInstance(args)
 		middlewares[clos]= instance
 	}
