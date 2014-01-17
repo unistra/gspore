@@ -15,7 +15,6 @@ import static groovyx.net.http.ContentType.BINARY
 import static groovyx.net.http.ContentType.URLENC
 import static groovyx.net.http.ContentType.HTML
 import errors.MethodCallError
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher
@@ -100,10 +99,7 @@ class Method {
 
 
 		int i=0
-		//ici il faut modifier les deux méthodes qui construisent
-		//la requête effective.
-		//les deux méthodes c'est placeHoldersreplacers
-		//et  buildPayload
+	
 		def finalPath = placeHoldersReplacer(reqParams).finalPath
 		def queryString = placeHoldersReplacer(reqParams).queryString
 
@@ -118,9 +114,7 @@ class Method {
 		 * ones, via middleware logic and store callbacks
 		 * intended on modifying the response
 		 * */
-		println "mec c'est pas ça que j'appelle"
 		delegate.middlewares.find{condition,middleware->
-			println "myjaggon"
 			def callback
 
 			/**If the condition was written in Java*/
@@ -143,7 +137,6 @@ class Method {
 			/**break loop
 			 */
 			if (callback in Response){
-				println "response"
 				noRequest=true
 				
 				return true
@@ -152,7 +145,6 @@ class Method {
 
 			/**store to process after request*/
 			if (callback!=null){
-				println "ouaismongars"
 				storedCallbacks+=callback
 			}
 			i++
@@ -164,20 +156,16 @@ class Method {
 		 * in reverse order.
 		 */
 		 storedCallbacks.reverseEach{
-			 println "OHOHOHOHOHOPHOHOHOHOHOHOHOHOJHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
 						 if (it.class==java.lang.reflect.Method){
 							 def declaringClass = it.getDeclaringClass()
 							 Object obj = declaringClass.newInstance([:])
 							 it.invoke(obj, environ)
 						 }else{
-						 //rechecke ici
-						 println "oooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
 						 	it()
 						 }
 					 }
-		
-		/**From here environ is not modified
-		*anymore
+		/**From here environ is not 
+		*modified anymore
 		*that's where missing
 		*or exceeding parameters
 		*errors can be raised.
@@ -216,13 +204,11 @@ class Method {
 					ret += json
 					ret+=" : "
 					ret+=statusCode
-					println  "ouais c'est quoi encore le délire ici?"+json
 					resp.properties.each{k,v->
 						//println k
 						//println v
 						
 					}
-					println  "ouais c'est quoi encore le délire ici?"+json.class
 				}
 
 				response.failure ={resp->
