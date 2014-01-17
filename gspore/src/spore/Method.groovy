@@ -112,32 +112,29 @@ class Method {
 		environ['spore.payload']=buildPayload(reqParams)
 		
 		/**rather not idiomatic breakable loop
-		 * that call middlewares. Breaks if a Response
+		 * that calls middlewares. Breaks if a Response
 		 * is found. Can modify any of the keys and values
 		 * of the request's base environment or create new
 		 * ones, via middleware logic and store callbacks
 		 * intended on modifying the response
 		 * */
-		println delegate.middlewares.each(){k,v->
-			println "closure"+k
-			println "middleware"+v
-		}
+		println "mec c'est pas ça que j'appelle"
 		delegate.middlewares.find{condition,middleware->
-
+			println "myjaggon"
 			def callback
 
-			//If the condition was written in Java
+			/**If the condition was written in Java*/
 			if (condition.class == java.lang.reflect.Method){
 				def declaringClass = condition.getDeclaringClass()
 				Object obj = declaringClass.newInstance([:])
 				if (condition.invoke(obj,environ)){
-					println "OUUUUUUUUUUUUUUUUUUUUUUUUUUUH3"+ obj
+				
 					callback =	middleware.call(environ)
 				}
 			}
-			//else (i.e if it is a groovy.lang.Closure)
+			/**else (i.e if it is a groovy.lang.Closure)*/
 			else if (condition(environ)){
-
+				println "oui"
 				callback =	middleware.call(environ)
 
 			}
@@ -146,17 +143,17 @@ class Method {
 			/**break loop
 			 */
 			if (callback in Response){
-				println "OUAIS, OUAIS"
+				println "response"
 				noRequest=true
+				
 				return true
 
 			}
 
 			/**store to process after request*/
 			if (callback!=null){
-
+				println "ouaismongars"
 				storedCallbacks+=callback
-
 			}
 			i++
 			/**pass control to next middleware*/
@@ -167,21 +164,18 @@ class Method {
 		 * in reverse order.
 		 */
 		 storedCallbacks.reverseEach{
-			 println  it
-						 it.properties.each{propName,propVal->
-							 //println "$propName : $propVal"
-						 }
+			 println "OHOHOHOHOHOPHOHOHOHOHOHOHOHOJHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
 						 if (it.class==java.lang.reflect.Method){
 							 def declaringClass = it.getDeclaringClass()
-							println declaringClass
 							 Object obj = declaringClass.newInstance([:])
 							 it.invoke(obj, environ)
-							 println "wwwwwwwwwwwwwwwwoooooooo"+ it.invoke(obj, environ)
 						 }else{
+						 //rechecke ici
+						 println "oooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
 						 	it()
 						 }
 					 }
-		 //	realRet?realRet+=it():(realRet=it())
+		
 		/**From here environ is not modified
 		*anymore
 		*that's where missing
@@ -199,23 +193,15 @@ class Method {
 		].each() {
 			!it.empty?errors+=it:''
 		}
-		// effective processing of the request
+		/**Effective processing of the request
+		 * */
+
 		if (errors.size()==0 && noRequest==false){
-			//là en l'état 
-			//base_url,method, content.type
-			//path
-			//query
-			//headers.Accept
-			//spore.payload
-			//PUIS
-			//
-			println "et là c'est vide mec"+environ["spore.headers"]
+			
 			builder.request(base_url,methods[method],contentTypesNormalizer(environ)) {
 				uri.path = finalPath
 				uri.query = queryString
 				environ["spore.headers"].each{k,v->
-					println "ouais"+k
-					println "bon"+v
 					headers."$k"="$v"
 				}
 				headers.'User-Agent' = 'Satanux/5.0'
@@ -236,11 +222,6 @@ class Method {
 						//println v
 						
 					}
-					json.properties.each{k,v->
-						println k
-						println v
-						
-					}
 					println  "ouais c'est quoi encore le délire ici?"+json.class
 				}
 
@@ -249,10 +230,6 @@ class Method {
 					ret+="request failure"+" : "+statusCode
 				}
 			}
-
-			//ça mec tu dois le déplacer dans le bloc au dessus
-			def realRet
-			
 		}
 		if (!requiredParamsMissing.empty){
 			requiredParamsMissing.each{
@@ -336,9 +313,12 @@ class Method {
 		}
 		param && param!="" && params.contains(param)
 	}
-	/**
+	/**The no-parameter version of 
+	 *contentTypesNormalizer is used
+     *only when generating the
+     *base environment of the request
 	 * @return a content-type
-	 * tje
+	 * 
 	 */
 	def contentTypesNormalizer(){
 		def normalized
@@ -350,9 +330,11 @@ class Method {
 	 * the content-type specified
 	 * in the environ (so that if it has
 	 * been modified by whatever middleware,
-	 * it is taken in account), the specific content type
-	 * for this method, or would it be missing, the 
-	 * global_format which is inherited from the spore.
+	 * it is taken in account), 
+	 * the specific content type
+	 * for this method, or would it be missing,
+	 *  the global_format which 
+	 * is inherited from the spore.
 	 */
 	def contentTypesNormalizer(args){
 		def normalized

@@ -91,7 +91,7 @@ class Spore {
 				//println me.getCause()
 			}
 		}
-	}
+	}		
 	
 	/**@param parsedJson : the Json from which the Method should
 	 * be created.
@@ -186,14 +186,15 @@ class Spore {
 		def instance = middleware.newInstance(args)
 		middlewares[clos]= instance
 	}
-	/**???
+	/**Lighter syntax for Jizzlewares
 	 * @param middleware
 	 * @param args
 	 * @return
 	 */
 	def enableIf(middleware,args){
-	//	def instance = middleware.newInstance(args)
-	//	middlewares[clos]= instance
+	def instance = middleware.newInstance(args)
+	def clos= instance.methodJizz("condition")
+	middlewares[clos]= instance
 	}
 	def addDefault(param,value){
 	}
