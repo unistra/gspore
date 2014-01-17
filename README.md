@@ -42,10 +42,10 @@ Jazzleware j = new Jazzleware();
 
 //enable Middleware conditionnaly
 
-spore.enableIf(j.getClass(), map12,j.methodJizz("condition"));
+spore.enableIf(j.getClass(), args);
 
-Map<Object,Object> map = new HashMap<Object ,Object>();
+Map<Object,Object> args0 = new HashMap<Object ,Object>();
 
 //call method
 
-spore.invokeMethod("methodNameFoundInTheJson",map)
+spore.invokeMethod("methodNameFoundInTheJson",args0)
