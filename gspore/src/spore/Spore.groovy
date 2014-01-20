@@ -4,7 +4,11 @@ import errors.MethodError
 import errors.SporeError
 
 class Spore {
-
+	static errorMessages=[
+		'name':'A name for this client is required',
+		'base_url':'A base URL to the REST Web Service is required',
+		'methods':'One method is required to create the client'
+	]
 	@Mandatory
 	def name
 	@Mandatory
@@ -35,10 +39,15 @@ class Spore {
 			}
 		}.keySet()
 		mandatoryFields.each(){
-			if (!args."$it") specErrors[it]="missing required field"
+			if (!args."$it") specErrors[it]="missing required field : $it"
 		}
-		if (specErrors.size>0){
-			//throw new SporeError()
+
+		if (specErrors.size()>0){
+			def errormessage=""
+			specErrors.each{
+				errormessage+=errorMessages[it.key]
+			}
+			throw new SporeError(errormessage)
 		}
 		/** Saturations of properties 
 		 *  with matching parsed JSON entries
@@ -87,12 +96,11 @@ class Spore {
 				 **/
 				m?.class==spore.Method?this.metaClass[k]=m.request:""
 			}catch (MethodError me){
-				//println me.getMessage()
-				//println me.getCause()
+				throw new MethodError(me)
 			}
 		}
-	}		
-	
+	}
+
 	/**@param parsedJson : the Json from which the Method should
 	 * be created.
 	 * @return either a Method either a String describing what prevented 
@@ -111,7 +119,7 @@ class Spore {
 			return checkResult
 		}
 	}
-	
+
 	/**Checks if the Json data from which the Method is to be created
 	 * is sufficient, i.e if it contains the mandatory fields.
 	 * @param parsedJson
@@ -119,20 +127,20 @@ class Spore {
 	 * a Map containing error messages registered under the concerned property name
 	 */
 	def methodIntegrityCheck(parsedJson){
-		
+
 		Map methodBuildError=[:]
 		List requiredParams = parsedJson['required_params']?:[]
 		List optionalParams = parsedJson['optional_params']?:[]
-		
+
 		def mandatoryFields=spore.Method.declaredFields.findAll {
 			Mandatory in it.declaredAnnotations*.annotationType()
 		}*.name
-			if (!requiredParams.disjoint(optionalParams)){
-				
-				methodBuildError["params"]="params cannot be optional and mandatory at the same time"
-				
+		if (!requiredParams.disjoint(optionalParams)){
+
+			methodBuildError["params"]="params cannot be optional and mandatory at the same time"
+
 		}
-			
+
 		parsedJson.each{k,v->
 			if (mandatoryFields.contains(k) && (!v || v.empty || v=='' )){
 
@@ -140,7 +148,7 @@ class Spore {
 
 			}
 		}
-		
+
 		if (!parsedJson['base_url'] && !parsedJson['api_base_url'] && !base_url){
 
 			methodBuildError['base_url']="Either a base_url or an api_base_url should be specified"
@@ -149,7 +157,7 @@ class Spore {
 		return methodBuildError?.size()==0?true:methodBuildError
 	}
 
-	
+
 	/**The method used to 
 	 * enable a Middleware to modifiy
 	 * requests and responses
@@ -158,7 +166,7 @@ class Spore {
 	 * @return
 	 */
 	def enable(middleware,args){
-	enableIf(middleware,args,{true})
+		enableIf(middleware,args,{true})
 	}
 	/**The method used to 
 	 * enable CONDITIONNALY a Middleware to modifiy
@@ -192,14 +200,14 @@ class Spore {
 	 * @return
 	 */
 	def enableIf(middleware,args){
-	def instance = middleware.newInstance(args)
-	def clos= instance.methodJizz("condition")
-	middlewares[clos]= instance
+		def instance = middleware.newInstance(args)
+		def clos= instance.methodJizz("condition")
+		middlewares[clos]= instance
 	}
 	def addDefault(param,value){
 	}
-	
+
 	def removeDefault(){
 	}
-	
+
 }
