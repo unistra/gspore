@@ -3,7 +3,8 @@
               Any modifications will be overwritten.
               To include a user specific buildfile here, simply create one in the same
               directory with the processing instruction <?eclipse.ant.import?>
-              as the first entry and export the buildfile again. --><project basedir="." default="build" name="GSpore">
+              as the first entry and export the buildfile again. -->
+<project basedir="." default="build" name="GSpore">
     <property environment="env"/>
     <property name="ECLIPSE_HOME" value="../../../../grails/springsource/ggts-3.4.0.RELEASE"/>
     <property name="debuglevel" value="source,lines,vars"/>
@@ -49,8 +50,8 @@
         <pathelement location="lib/http-builder-0.7-SNAPSHOT/dependencies/xml-resolver-1.2.jar"/>
     </path>
     <target name="init">
-        <mkdir dir="bin"/>
-        <copy includeemptydirs="false" todir="bin">
+        <mkdir dir="what"/>
+        <copy includeemptydirs="false" todir="what">
             <fileset dir="src">
                 <exclude name="**/*.launch"/>
                 <exclude name="**/*.java"/>
@@ -72,9 +73,9 @@
     </target>
     <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
     <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
-        <copy todir="${ant.library.dir}">
-            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
-        </copy>
+    	<zip destfile="compiled/gspore-all.jar">
+    	    <zipgroupfileset dir="lib"  includes="**/*.jar" followsymlinks="true"/>
+    	</zip>
         <unzip dest="${ant.library.dir}">
             <patternset includes="jdtCompilerAdapter.jar"/>
             <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
