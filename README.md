@@ -17,7 +17,7 @@ Spore spore = feed.feed("/pathToMyJson/test.json")
 spore.enable(spore.Middleware,["processRequest":{localArgs->localArgs["spore.headers"]=["k":"v"]},payload:["entry":["subEntry":'value']]])
 
 //same thing, with a boolean returning closure to specify wether or not
-//the Middleware should be enabled 
+the Middleware should be enabled 
 
 spore.enableIf(spore.Middleware,[payload:["k":"v"]]){
 			 spore.name!=null
