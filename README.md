@@ -1,8 +1,10 @@
 gspore
 ======
-SPORE CLIENT 
 
-sample groovy syntax :
+SPORE CLIENT 
+------------
+
+###sample groovy syntax :
 
 //Instanciate Json reader
 
@@ -27,7 +29,7 @@ spore.enableIf(spore.Middleware,[payload:["k":"v"]]){
 
 spore.methodNameFoundInTheJson([arg1:"test",arg2:2,id:"unid"])
 
-sample java syntax : 
+###sample java syntax : 
 
 //Instanciate Json feeder
 
