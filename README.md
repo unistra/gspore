@@ -6,32 +6,32 @@ SPORE CLIENT
 
 ###sample groovy syntax :
 
->//Instanciate Json reader
+>*//Instanciate Json reader*
 
 >SporeFeeder feed =new SporeFeeder()
 
->//Create Spore
+>*//Create Spore*
 
 >Spore spore = feed.feed("/pathToMyJson/test.json")
 
->//Enable Middleware, from hard-coded class or by generating a modified at runtime Middleware
+>*//Enable Middleware, from hard-coded class or by generating a modified at runtime Middleware*
 
 >spore.enable(spore.Middleware,["processRequest":{localArgs->localArgs["spore.headers"]=["k":"v"]},payload:["entry":["subEntry":'value']]])
 
->//same thing, with a boolean returning closure to specify wether or not
-the Middleware should be enabled 
+>*//same thing, with a boolean returning closure to specify wether or not
+the Middleware should be enabled*
 
 >spore.enableIf(spore.Middleware,[payload:["k":"v"]]){
 			 spore.name!=null
 			 }
 
->//call method
+>*//call method*
 
 >spore.methodNameFoundInTheJson([arg1:"test",arg2:2,id:"unid"])
 
 ###sample java syntax : 
 
->//Instanciate Json feeder
+>*//Instanciate Json feeder*
 
 >SporeFeeder feed = new SporeFeeder();
 		
@@ -39,16 +39,16 @@ the Middleware should be enabled
 		
 >Spore spore = (Spore)o;
 
->//Instanciate Middleware from hard-coded class
+>*//Instanciate Middleware from hard-coded class*
 
 >Jazzleware j = new Jazzleware();
 
->//enable Middleware conditionnaly
+>*//enable Middleware conditionnaly*
 
 >spore.enableIf(j.getClass(), args);
 
 >Map<Object,Object> args0 = new HashMap<Object ,Object>();
 
->//call method
+>*//call method*
 
 >spore.invokeMethod("methodNameFoundInTheJson",args0)
