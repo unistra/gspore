@@ -16,7 +16,10 @@ SPORE CLIENT
 
 >*//Enable Middleware, from hard-coded class or by generating a modified at runtime Middleware*
 
->**spore.enable(spore.Middleware,[  "processRequest":{localArgs->  localArgs["spore.headers"]=["k":"v"]},  payload:["entry":["subEntry":'value']]  ])**
+>**spore.enable(spore.Middleware,[  
+"processRequest":{localArgs->  
+localArgs["spore.headers"]=["k":"v"]},  payload:["entry":["subEntry":'value']]  
+])**
 
 >*//same thing, with a boolean returning closure to specify wether or not
 the Middleware should be enabled*
