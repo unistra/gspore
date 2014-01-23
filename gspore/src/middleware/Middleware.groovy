@@ -1,4 +1,4 @@
-package spore
+package middleware
 
 class Middleware {
 

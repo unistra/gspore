@@ -79,7 +79,8 @@ class Method {
 			'spore.errors': '',
 			'spore.format': contentTypesNormalizer(),
 			'spore.userinfo': urlParse().userInfo,
-			'wsgi.url_scheme': urlParse().scheme
+			'wsgi.url_scheme': urlParse().scheme,
+			'name':name
 
 		]
 	}
@@ -128,17 +129,14 @@ class Method {
 			}
 			/**else (i.e if it is a groovy.lang.Closure)*/
 			else if (condition(environ)){
-				println "oui"
 				callback =	middleware.call(environ)
-
 			}
-
 
 			/**break loop
 			 */
 			if (callback in Response){
 				noRequest=true
-				
+				ret = callback?."/$name"().response
 				return true
 
 			}
@@ -151,8 +149,9 @@ class Method {
 			/**pass control to next middleware*/
 			return false
 		}
-		
-		/**Resolution of the stored callbacks
+		/**Resolution of the stored callbacks,
+		 * which should be either reflect.Methods
+		 * either Closures,
 		 * in reverse order.
 		 */
 		 storedCallbacks.reverseEach{
@@ -161,9 +160,13 @@ class Method {
 							 Object obj = declaringClass.newInstance([:])
 							 it.invoke(obj, environ)
 						 }else{
-						 	it()
+						 //ici tu as une linkedHashMap mon gars
+						 //par ailleurs, tu ne devrais pas arriver juste là
+						 println "GETPARAMETERTYPES"+ it?.getParameterTypes()
+						 	it(environ)
 						 }
 					 }
+		
 		/**From here environ is not 
 		*modified anymore
 		*that's where missing
@@ -183,7 +186,6 @@ class Method {
 		}
 		/**Effective processing of the request
 		 * */
-
 		if (errors.size()==0 && noRequest==false){
 			
 			builder.request(base_url,methods[method],contentTypesNormalizer(environ)) {
@@ -223,8 +225,9 @@ class Method {
 				environ["spore.errors"]?environ["spore.errors"]+="$it is missing for $name":(environ["spore.errors"]="$it is missing for $name")
 			}
 		}
-		return [ret:ret,environ:environ]//test purpose
+		return ret//test purpose
 	}
+	
 	/**Transforms the raw path still
 	 * containing placeHolders
 	 * with matching values found 

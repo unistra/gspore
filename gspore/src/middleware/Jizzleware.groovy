@@ -1,4 +1,4 @@
-package spore
+package middleware
 import java.lang.reflect.Method
 
 class Jizzleware extends Middleware{

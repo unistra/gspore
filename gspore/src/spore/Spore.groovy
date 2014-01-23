@@ -2,6 +2,7 @@ package spore
 
 import errors.MethodError
 import errors.SporeError
+import middleware.*
 
 class Spore {
 	static errorMessages=[
@@ -49,6 +50,7 @@ class Spore {
 			}
 			throw new SporeError(errormessage)
 		}
+		
 		/** Saturations of properties 
 		 *  with matching parsed JSON entries
 		 */
@@ -194,6 +196,7 @@ class Spore {
 		def instance = middleware.newInstance(args)
 		middlewares[clos]= instance
 	}
+	
 	/**Lighter syntax for Jizzlewares
 	 * @param middleware
 	 * @param args
@@ -204,6 +207,7 @@ class Spore {
 		def clos= instance.methodJizz("condition")
 		middlewares[clos]= instance
 	}
+	
 	def addDefault(param,value){
 	}
 
