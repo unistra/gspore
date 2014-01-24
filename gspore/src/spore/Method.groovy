@@ -132,7 +132,6 @@ class Method {
 			}
 			/**else (i.e if it is a groovy.lang.Closure)*/
 			else if (condition(environ)){
-				//TEMPLE OF BOOM :middlewares are callable
 				callback=middleware(environ)
 				//callback =	middleware?.call(environ)?:null
 			}
@@ -141,8 +140,8 @@ class Method {
 			 */
 			if (callback in Response){
 				noRequest=true
-				//TODO fais quelque chose pour ça s'il te-plait
 				ret = callback(environ)
+				println "RET"+ret
 				return true
 			}
 
