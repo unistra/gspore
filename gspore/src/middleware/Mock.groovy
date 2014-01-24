@@ -27,23 +27,33 @@ assert('Content-Type' in result.headers)
 		}
 	this.metaClass."fakes" = args['fakes']
 	this.metaClass."middlewares" = args['middlewares']?:[]
-		this.properties.each(){k,v->
-			println k
-			println v
-		
-		}
 	}
 	
 	def processRequest(environ){
 		def args = [:]
-		this."fakes".each{path,closure->
+		this?."fakes"?.each{path,closure->
+			//il faudrait virer la référence à 'name'
+			//et ça serait bien de ne pas le mettre dans les base environs.
+			//Si la méthode doit être désactivée
+			//par le middleware
 			if (path == ('/'+environ['name'])){
 				args[path]=closure
 				args["response"]=closure().response
 			}
 		}
+		if (args["response"]){
 		Response r = new Response(args)
 		return r
+		}else {
+		println 'else'
+		return null
+		}
+	}
+	def call(){
+		println "I AM CALLABLE"
+	}
+	def call(oneArg){
+		println oneArg
 	}
 	def mockProcessResponse(){
 		

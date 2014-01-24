@@ -58,7 +58,11 @@ class Method {
 			}
 		}
 	}
-
+	
+	/**@return Request environment 
+	 * before middleware or effective 
+	 * request modifications
+	 */
 	def baseEnviron(){
 
 		def normalizedPath=path.split ('/').collect{it.trim()}-null-""
@@ -85,9 +89,8 @@ class Method {
 		]
 	}
 
-	/**Builds the actual request from 
+	/**A closure that builds the actual request from 
 	 * environ, parameters and enabled middlewares
-	 * in that order
 	 */
 	def request={reqParams->
 
@@ -129,16 +132,18 @@ class Method {
 			}
 			/**else (i.e if it is a groovy.lang.Closure)*/
 			else if (condition(environ)){
-				callback =	middleware.call(environ)
+				//TEMPLE OF BOOM :middlewares are callable
+				callback=middleware(environ)
+				//callback =	middleware?.call(environ)?:null
 			}
 
 			/**break loop
 			 */
 			if (callback in Response){
 				noRequest=true
-				ret = callback?."/$name"().response
+				//TODO fais quelque chose pour ça s'il te-plait
+				ret = callback(environ)
 				return true
-
 			}
 
 			/**store to process after request*/
@@ -149,6 +154,7 @@ class Method {
 			/**pass control to next middleware*/
 			return false
 		}
+		
 		/**Resolution of the stored callbacks,
 		 * which should be either reflect.Methods
 		 * either Closures,
@@ -160,9 +166,6 @@ class Method {
 							 Object obj = declaringClass.newInstance([:])
 							 it.invoke(obj, environ)
 						 }else{
-						 //ici tu as une linkedHashMap mon gars
-						 //par ailleurs, tu ne devrais pas arriver juste là
-						 println "GETPARAMETERTYPES"+ it?.getParameterTypes()
 						 	it(environ)
 						 }
 					 }
@@ -225,7 +228,8 @@ class Method {
 				environ["spore.errors"]?environ["spore.errors"]+="$it is missing for $name":(environ["spore.errors"]="$it is missing for $name")
 			}
 		}
-		return ret//test purpose
+		println environ
+		return ret
 	}
 	
 	/**Transforms the raw path still

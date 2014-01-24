@@ -74,12 +74,8 @@
     <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
     <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
     	<zip destfile="compiled/gspore-all.jar">
-    	    <zipgroupfileset dir="lib"  includes="**/*.jar" followsymlinks="true"/>
+    	    <zipgroupfileset dir="lib"  includes="**/*.jar,  src/*.groovy" followsymlinks="true"/>
     	</zip>
-        <unzip dest="${ant.library.dir}">
-            <patternset includes="jdtCompilerAdapter.jar"/>
-            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
-        </unzip>
     </target>
     <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
         <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>

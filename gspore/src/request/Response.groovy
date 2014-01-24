@@ -7,4 +7,11 @@ class Response {
 			this.metaClass."$k"=v
 		}
 	}
+	def call(){
+		
+	}
+	def call(args){
+		args
+	}
 }
+
