@@ -23,13 +23,14 @@ class Spore {
 	def meta
 	def middlewares=[:]
 	def user_agent
+	def originalMethods
 
 	/**Explicit constructor
 	 * When an explicit constructor is specified,
 	 * the default initialization doesn't work
 	 * */
 	Spore(args){
-
+		originalMethods=this.metaClass.methods*.name
 		def specErrors=[:]
 		def methodErrors=[:]
 
@@ -68,25 +69,25 @@ class Spore {
 		 * signature that must be fulfilled with
 		 * a parameter Map.
 		 * */
-		args?."methods".each(){k,v->
+		args?."methods".each(){methodName,value->
 			try{
-				methods+=k
+				methods+=methodName
 				def m = createMethod([
-					name:k,
+					name:methodName,
 					/**Inherited from spore if not specified in the parsed Json*/
-					base_url:![null, ""].contains(v['base_url'])?v['base_url']:base_url,
+					base_url:![null, ""].contains(value['base_url'])?value['base_url']:base_url,
 					/**Found in the Json [k]*/
-					path:v['path'],
-					method:v['method'],
-					required_params:v['required_params'],
-					optional_params:v['optional_params'],
-					expected_status:v['expected_status'],
-					required_payload:v['required_payload'],
-					description:v['description'],
-					authentication:v['authentication'],
-					formats:v['formats'],
-					documentation:v['documentation'],
-					defaults : v['defaults'],
+					path:value['path'],
+					method:value['method'],
+					required_params:value['required_params'],
+					optional_params:value['optional_params'],
+					expected_status:value['expected_status'],
+					required_payload:value['required_payload'],
+					description:value['description'],
+					authentication:value['authentication'],
+					formats:value['formats'],
+					documentation:value['documentation'],
+					defaults : value['defaults'],
 					/**Inherited from Spore*/
 					middlewares:middlewares,
 					global_authentication:authentication,
@@ -96,7 +97,7 @@ class Spore {
 				 *is dynamically added to the Spore 
 				 *If no Method could be created, nothing happens.
 				 **/
-				m?.class==spore.Method?this.metaClass[k]=m.request:""
+				m?.class==spore.Method?this.metaClass[methodName]=m.request:""
 			}catch (MethodError me){
 				throw new MethodError(me)
 			}
@@ -212,6 +213,9 @@ class Spore {
 	}
 	//TODO
 	def removeDefault(){
+	}
+	def description(){
+		this.metaClass.methods*.name-originalMethods
 	}
 
 }

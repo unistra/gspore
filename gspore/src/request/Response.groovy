@@ -24,11 +24,7 @@ class Response {
 		
 	}
 	def call(args){
-		println args
-		this.properties.each{k,v->
-			println k
-			println v
-		}
+		this.properties.findAll{key,value->!['class','metaClass'].contains(key)}
 	}
 }
 
