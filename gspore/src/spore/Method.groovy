@@ -93,6 +93,7 @@ class Method {
 	 * environ, parameters and enabled middlewares
 	 */
 	def request={reqParams->
+
 		boolean noRequest=false
 		Map environ = baseEnviron()
 		Map modifiedEnvirons = [:]
@@ -101,6 +102,7 @@ class Method {
 		def (requiredParamsMissing,whateverElseMissing,errors,storedCallbacks)=[[], [], [], []]
 		def finalPath = placeHoldersReplacer(reqParams,path,this).finalPath
 		def queryString = placeHoldersReplacer(reqParams,path,this).queryString
+
 		environ['QUERY_STRING']=queryString
 		environ['spore.params']=buildParams(reqParams,this)
 		environ['spore.payload']=buildPayload(reqParams)
@@ -120,7 +122,7 @@ class Method {
 				def declaringClass = condition.getDeclaringClass()
 				Object obj = declaringClass.newInstance([:])
 				if (condition.invoke(obj,environ)){
-					callback =	middleware.call(environ)
+					callback =        middleware.call(environ)
 				}
 			}
 			/**else (i.e if it is a groovy.lang.Closure)*/
@@ -197,7 +199,27 @@ class Method {
 		}
 		return ret
 	}
-
+	/**No success with that by that point
+	 * 
+	 */
+	def javaOrGroovyCall(condition,environ,middleware){
+		def callback
+		if (condition.class == java.lang.reflect.Method){
+			def declaringClass = condition.getDeclaringClass()
+			Object obj = declaringClass.newInstance([:])
+			if (condition.invoke(obj,environ)){
+				if (middleware){
+					callback =	middleware.call(environ)
+				}
+			}
+			else if (condition(environ)){
+				if (middleware){
+					callback=middleware(environ)
+				}
+			}
+		}
+		return callback?callback:null
+	}
 	/**The no-parameter version of 
 	 *contentTypesNormalizer is used
 	 *only when generating the

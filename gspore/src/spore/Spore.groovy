@@ -31,27 +31,7 @@ class Spore {
 	 * */
 	Spore(args){
 		originalMethods=this.metaClass.methods*.name
-		def specErrors=[:]
-		def methodErrors=[:]
-
-		/**Get all properties declared as mandatory*/
-		def mandatoryFields=this.properties.findAll { prop ->
-			this.getClass().declaredFields.find {
-				it.name == prop.key && Mandatory in it.declaredAnnotations*.annotationType()
-			}
-		}.keySet()
-		mandatoryFields.each(){
-			if (!args."$it") specErrors[it]="missing required field : $it"
-		}
-
-		if (specErrors.size()>0){
-			def errormessage=""
-			specErrors.each{
-				errormessage+=errorMessages[it.key]
-			}
-			throw new SporeError(errormessage)
-		}
-		
+		sporeErrors(args)
 		/** Saturations of properties 
 		 *  with matching parsed JSON entries
 		 */
@@ -210,12 +190,38 @@ class Spore {
 	}
 	//TODO
 	def addDefault(param,value){
+		
 	}
 	//TODO
 	def removeDefault(){
+		
 	}
 	def description(){
-		this.metaClass.methods*.name-originalMethods
+		(this.metaClass.methods*.name-originalMethods).sort().unique()
+	}
+	def sporeErrors(args){
+		def specErrors=[:]
+		
+		/**Get all properties declared as mandatory
+		 * and register missing properties passed
+		 * to the SporeError
+		 * */
+		def mandatoryFields=this.properties.findAll { prop ->
+			this.getClass().declaredFields.find {
+				it.name == prop.key && Mandatory in it.declaredAnnotations*.annotationType()
+			}
+		}.keySet()
+		mandatoryFields.each(){
+			if (!args."$it") specErrors[it]="missing required field : $it"
+		}
+
+		if (specErrors.size()>0){
+			def errormessage=""
+			specErrors.each{
+				errormessage+=errorMessages[it.key]
+			}
+			throw new SporeError(errormessage)
+		}
 	}
 
 }

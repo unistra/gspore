@@ -33,7 +33,7 @@ class Request {
 				headers.Accept=contentTypesNormalizer(args)
 
 				if (["POST", "PUT", "PATCH"].contains(request.method)){
-					send contentTypesNormalizer(),args['spore.payload']
+					send contentTypesNormalizer(args),args['spore.payload']
 				}
 
 				response.success =  {resp,json->

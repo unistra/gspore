@@ -12,7 +12,7 @@ class SporeFeeder {
 	 * or from a file feed calls feedFromJson or feedFromUrl to
 	 * slurp the Json into a Spore constructor
 	 */
-	def feed(spec_uri,base_url=null){
+	public static feed(spec_uri,base_url=null){
 		
 		def api_description = spec_uri.startsWith('http')?feedFromUrl(spec_uri):feedFromJson(spec_uri)
 		if (!api_description["base_url"]){
@@ -22,10 +22,10 @@ class SporeFeeder {
 		}
 		return new Spore(api_description)
 	}
-	private def feedFromJson(specs){
+	private static def feedFromJson(specs){
 		 slurper.parse(new FileReader(specs))
 	}
-	private def feedFromUrl(specs){
+	private static def feedFromUrl(specs){
 		URL url = new URL(specs)
 		InputStream urlStream = url.openStream();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(urlStream));
