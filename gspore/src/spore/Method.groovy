@@ -26,6 +26,7 @@ import static utils.MethodUtils.placeHoldersReplacer
 import static utils.MethodUtils.buildPayload;
 import static utils.MethodUtils.buildParams;
 import static request.Request.requestSend;
+import errors.MethodCallError
 
 class Method {
 	static contentTypes = ['JSON':JSON,'TEXT':TEXT,'XML':XML,"HTML":HTML,"URLENC":URLENC,"BINARY":BINARY]
@@ -167,7 +168,9 @@ class Method {
 		 **/
 		if (noRequest==false){
 			required_params.each{
-				if (!reqParams.containsKey(it) &&  ! environ['spore.params']){
+				println reqParams.containsKey(it)
+				println environ['spore.params']
+				if (!reqParams.containsKey(it) &&  ! environ['spore.params'].containsKey(it)){
 					requiredParamsMissing+=it
 				}
 			}
@@ -176,6 +179,9 @@ class Method {
 				whateverElseMissing
 			].each() {
 				!it.empty?errors+=it:''
+			}
+			if(errors.size()>0){
+				throw new MethodCallError("required param missing : $errors")
 			}
 		}
 		/**Effective processing of the request
@@ -199,6 +205,8 @@ class Method {
 		}
 		return ret
 	}
+	
+	
 	/**No success with that by that point
 	 * 
 	 */

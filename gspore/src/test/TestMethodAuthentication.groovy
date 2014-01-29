@@ -2,7 +2,6 @@ package test
 
 import org.junit.Test;
 import org.junit.*;
-
 import groovy.util.GroovyTestCase
 
 class TestMethodAuthentication extends GroovyTestCase {
@@ -11,10 +10,4 @@ class TestMethodAuthentication extends GroovyTestCase {
 	void testAnythingAnything(){
 		 assert 1 == 1
 	}
-	@Test
-	void testBla(){
-		 assert 1 == 2
-	}
-	
-
 }
