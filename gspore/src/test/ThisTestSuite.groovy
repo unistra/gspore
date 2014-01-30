@@ -13,9 +13,7 @@ class ThisTestSuite extends TestSuite{
 		suite.addTestSuite(gsuite.compile(TEST_ROOT + "TestMethodAuthentication.groovy"));
 		suite.addTestSuite(gsuite.compile(TEST_ROOT + "TestMethodRequiredParameters.groovy"));
 		suite.addTestSuite(gsuite.compile(TEST_ROOT + "TestMethodBuilder.groovy"));
-		suite.addTestSuite(gsuite.compile(TEST_ROOT + "TestMethodBuilder.groovy"));
 		suite.addTestSuite(gsuite.compile(TEST_ROOT + "TestMethodPayload.groovy"));
-		//suite.addTestSuite(gsuite.compile(TEST_ROOT + "TestMethodAuthentication.groovy"));
 		return suite;
 	}
 
