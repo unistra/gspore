@@ -1,6 +1,7 @@
 package utils
 
 import java.util.Map;
+import errors.MethodCallError
 
 class MethodUtils {
 
@@ -67,7 +68,12 @@ class MethodUtils {
 				params+=it
 			}
 		}
-		param && param!="" && params.contains(param)
+		if (!params.contains(param)){
+			throw new MethodCallError("Unregistered parameter")
+		}else{
+		return true
+		}
+		//return param && param!="" && params.contains(param)
 	}
 	/**
 	 * @param method : the method for which the parameterBuilder is called

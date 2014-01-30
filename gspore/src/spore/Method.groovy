@@ -168,8 +168,6 @@ class Method {
 		 **/
 		if (noRequest==false){
 			required_params.each{
-				println reqParams.containsKey(it)
-				println environ['spore.params']
 				if (!reqParams.containsKey(it) &&  ! environ['spore.params'].containsKey(it)){
 					requiredParamsMissing+=it
 				}
