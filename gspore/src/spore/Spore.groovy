@@ -90,14 +90,14 @@ class Spore {
 	 * the method from being created.
 	 */
 	def createMethod(parsedJson)throws MethodError{
-		String message = ""
 		def checkResult = methodIntegrityCheck(parsedJson)
+		println checkResult
 		if (checkResult==true){
 			return new Method(parsedJson)
 		}else{
-			checkResult.each(){k,v->
-				message+=(k+" : "+v)
-			}
+		String message=checkResult.values().join(';')
+		
+			
 			throw new MethodError(message,new Throwable(message))
 			return checkResult
 		}
@@ -119,19 +119,16 @@ class Spore {
 			Mandatory in it.declaredAnnotations*.annotationType()
 		}*.name
 		if (!requiredParams.disjoint(optionalParams)){
-
 			methodBuildError["params"]="params cannot be optional and mandatory at the same time"
 
 		}
-
-		parsedJson.each{k,v->
-			if (mandatoryFields.contains(k) && (!v || v.empty || v=='' )){
-
-				methodBuildError[k]="$k is a required field for generated methods, $k couldn't  be generated"
-
+		(mandatoryFields-"api_base_url").each {requiredField->
+			if (!parsedJson.find{k,v->
+				k==requiredField
+			}){
+				methodBuildError[requiredField]="$requiredField is a required field for generated methods, $requiredField couldn't  be generated"
 			}
 		}
-
 		if (!parsedJson['base_url'] && !parsedJson['api_base_url'] && !base_url){
 
 			methodBuildError['base_url']="Either a base_url or an api_base_url should be specified"
@@ -177,7 +174,7 @@ class Spore {
 		def instance = middleware.newInstance(args)
 		middlewares[clos]= instance
 	}
-	
+
 	/**Lighter syntax for Jizzlewares
 	 * @param middleware
 	 * @param args
@@ -190,18 +187,18 @@ class Spore {
 	}
 	//TODO
 	def addDefault(param,value){
-		
+
 	}
 	//TODO
 	def removeDefault(){
-		
+
 	}
 	def description(){
 		(this.metaClass.methods*.name-originalMethods).sort().unique()
 	}
 	def sporeErrors(args){
 		def specErrors=[:]
-		
+
 		/**Get all properties declared as mandatory
 		 * and register missing properties passed
 		 * to the SporeError

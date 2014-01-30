@@ -22,8 +22,9 @@ class MethodUtils {
 	 * @param p : the request effective parameters
 	 * @return the payload
 	 */
-	public static buildPayload(p){
+	public static buildPayload(p,method){
 		def entry = p["payload"]
+		if (method.required_payload && !entry) throw new MethodCallError('Payload is required for this function')
 		p.remove("payload")
 		return entry
 	}

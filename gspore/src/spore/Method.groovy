@@ -106,7 +106,7 @@ class Method {
 
 		environ['QUERY_STRING']=queryString
 		environ['spore.params']=buildParams(reqParams,this)
-		environ['spore.payload']=buildPayload(reqParams)
+		environ['spore.payload']=buildPayload(reqParams,this)
 
 		/**rather not idiomatic breakable loop that
 		 * calls middlewares. Breaks if a Response

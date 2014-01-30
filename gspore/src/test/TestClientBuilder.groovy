@@ -6,25 +6,25 @@ import spore.Spore
 import errors.SporeError
 
 class TestClientBuilder extends GroovyTestCase {
-
+	def args = [
+		'name':'name',
+		'base_url':'base_url',
+		'methods':[
+			"method1" : [
+				"path" : "/target/method1",
+				"method" : "POST"
+			],
+			"method2" : [
+				"path" : "/target/method2",
+				"method" : "GET"
+			]
+		]
+	]
 
 	@Test
 	void testMissingRequiredPropertyInDesc(){
 		
-		def args = [
-			'name':'name',
-			'base_url':'base_url',
-			'methods':[
-				"method1" : [
-					"path" : "/target/method1",
-					"method" : "POST"
-				],
-				"method2" : [
-					"path" : "/target/method2",
-					"method" : "GET"
-				]
-			]
-		]
+		
 		
 		def errorMessage=""
 		
@@ -44,20 +44,7 @@ class TestClientBuilder extends GroovyTestCase {
 	
 	@Test
 	void testDynamicMethodInjection(){
-		def args = [
-			'name':'name',
-			'base_url':'base_url',
-			'methods':[
-				"method1" : [
-					"path" : "/target/method1",
-					"method" : "POST"
-				],
-				"method2" : [
-					"path" : "/target/method2",
-					"method" : "GET"
-				]
-			]
-		]
+	
 		
 		Spore spore= new Spore(args)
 	
