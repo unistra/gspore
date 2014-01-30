@@ -22,10 +22,10 @@ class SporeFeeder {
 		}
 		return new Spore(api_description)
 	}
-	private static def feedFromJson(specs){
+	private static def feedFromJson(specs) throws java.io.FileNotFoundException,groovy.json.JsonException{
 		 slurper.parse(new FileReader(specs))
 	}
-	private static def feedFromUrl(specs){
+	private static def feedFromUrl (specs) throws java.net.UnknownHostException,groovy.json.JsonException{
 		URL url = new URL(specs)
 		InputStream urlStream = url.openStream();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(urlStream));
