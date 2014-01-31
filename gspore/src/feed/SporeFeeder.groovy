@@ -12,7 +12,7 @@ class SporeFeeder {
 	 * or from a file feed calls feedFromJson or feedFromUrl to
 	 * slurp the Json into a Spore constructor
 	 */
-	public static feed(spec_uri,base_url=null){
+	public static Spore feed(spec_uri,base_url=null){
 		
 		def api_description = spec_uri.startsWith('http')?feedFromUrl(spec_uri):feedFromJson(spec_uri)
 		if (!api_description["base_url"]){

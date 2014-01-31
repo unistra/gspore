@@ -10,9 +10,6 @@ import groovy.json.JsonException
 import spore.Spore
 
 class TestClientGenerator extends GroovyTestCase{
-	//depuis des jars tout ce qui ressorti
-	//à du this.getClass().getResource()
-	//foire
 	Spore spore
 	JsonSlurper slurper = new JsonSlurper()
 	@Test

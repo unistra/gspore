@@ -38,6 +38,7 @@ class MethodUtils {
 	 * @return the corrected path
 	 */
 	public static placeHoldersReplacer(req,path,method){
+		println "PATH"
 		Map queryString = req
 		String corrected=""
 		Map finalQuery=[:]

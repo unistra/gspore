@@ -22,20 +22,17 @@ class Request {
 	
 	public static String requestSend(args){
 		def ret=""
-		builder.request(args['base_url'],methods[args['method']],contentTypesNormalizer(args)) {
-			
-				uri.path = args['finalPath']
+		builder.request(finalUrl(args),methods[args['method']],contentTypesNormalizer(args)) {
+				uri.path = args['finalPath'][1..-1]
 				uri.query = args['queryString']
 				args["spore.headers"].each{k,v->
 					headers."$k"="$v"
 				}
 				headers.'User-Agent' = 'Satanux/5.0'
 				headers.Accept=contentTypesNormalizer(args)
-
 				if (["POST", "PUT", "PATCH"].contains(request.method)){
 					send contentTypesNormalizer(args),args['spore.payload']
 				}
-
 				response.success =  {resp,json->
 					String statusCode=String?.valueOf(resp.statusLine.statusCode)
 					ret += json
@@ -49,6 +46,16 @@ class Request {
 				}
 			}
 		return ret
+	}
+	public static finalUrl(args){
+		args['wsgi.url_scheme']+"://"+domainNameAndServerPort(args['SERVER_NAME'],args['SERVER_PORT'])+args['SCRIPT_NAME']
+	}
+	public static String domainNameAndServerPort(domainName,serverPort){
+		def ret
+		if(domainName.indexOf(':')==-1){
+			ret=domainName+":"+serverPort
+		}
+		else ret=domainName
 	}
 	/**
 	 * @return in this order

@@ -68,15 +68,21 @@ class Method {
 	 * request modifications
 	 */
 	def baseEnviron(){
-
+		
 		def normalizedPath=path.split ('/').collect{it.trim()}-null-""
 		def formatedPathRemainder=path.replace('/'+(normalizedPath[0]),'')
+		/*println urlParse(base_url).hostName
+		println "MEC"+urlParse(base_url).path
+		println base_url
+		println path
+		println "1"+normalizedPath
+		println "2"+formatedPathRemainder*/
 		return [
 			'REQUEST_METHOD': method,
 			'SERVER_NAME': urlParse(base_url).hostName,
-			'SERVER_PORT': urlParse(base_url).serverPort,
-			'SCRIPT_NAME': normalizedPath.size()>0?('/'+(normalizedPath[0])):"",
-			'PATH_INFO': formatedPathRemainder,
+			'SERVER_PORT': urlParse(base_url).serverPort!=-1?urlParse(base_url).serverPort:base_url.startsWith('https')?443:base_url.startsWith('http')?80:'',
+			'SCRIPT_NAME': urlParse(base_url).path,//!=""?urlParse(base_url).path:normalizedPath.size()>0?('/'+(normalizedPath[0])):"",
+			'PATH_INFO': path,
 			'QUERY_STRING': "",
 			'HTTP_USER_AGENT': 'whatever',
 			'spore.expected_status': expected_status?:"",
@@ -103,7 +109,7 @@ class Method {
 		def (requiredParamsMissing,whateverElseMissing,errors,storedCallbacks)=[[], [], [], []]
 		def finalPath = placeHoldersReplacer(reqParams,path,this).finalPath
 		def queryString = placeHoldersReplacer(reqParams,path,this).queryString
-
+		println "FINALPATH"+finalPath
 		environ['QUERY_STRING']=queryString
 		environ['spore.params']=buildParams(reqParams,this)
 		environ['spore.payload']=buildPayload(reqParams,this)
@@ -190,6 +196,7 @@ class Method {
 			environ['base_url']=base_url
 			environ['method']=method
 			environ['finalPath']=finalPath
+			println "OoUiIiUiYEYhgcfc"+finalPath
 			environ['queryString']=queryString
 			ret = requestSend(environ)
 		}
