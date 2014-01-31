@@ -10,7 +10,9 @@ import groovy.json.JsonException
 import spore.Spore
 
 class TestClientGenerator extends GroovyTestCase{
-	//
+	//depuis des jars tout ce qui ressorti
+	//à du this.getClass().getResource()
+	//foire
 	Spore spore
 	JsonSlurper slurper = new JsonSlurper()
 	@Test
@@ -38,36 +40,79 @@ class TestClientGenerator extends GroovyTestCase{
 		def errorMessage=""
 		try{
 			def wrongJson = this.getClass().getResource("wrong.json")
-			feed(wrongJson.path)
+			InputStream urlStream = wrongJson.openStream();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(urlStream));
+			File j = new File("newwrong.json")
+			j.append(reader.getText())
+			String jsonString = j.text
+			def content=slurper.parseText(j.text)
+			feed(j.path)
+			if(j.delete()){
+				System.out.println(j.getName() + " is deleted!");
+			}else{
+				System.out.println("Delete operation is failed.");
+			}
 		}catch (JsonException j){
 			errorMessage=j.getMessage()
 		}
+		
 		assertTrue errorMessage!=""
 	}
 	@Test
 	void testWithoutBaseUrl(){
-		def jsonMissingBaseUrl = this.getClass().getResource("right.json")
-		InputStream urlStream = jsonMissingBaseUrl.openStream();
+		def correctJson = this.getClass().getResource("right.json")
+		InputStream urlStream = correctJson.openStream();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(urlStream));
-		def content=slurper.parse(reader)
-		spore = feed(jsonMissingBaseUrl.path)
+		File j = new File("newright.json")
+		j.append(reader.getText())
+		String jsonString = j.text
+		def content=slurper.parseText(j.text)
+		spore = feed(j.path)
+		if(j.delete()){
+			System.out.println(j.getName() + " is deleted!");
+		}else{
+			System.out.println("Delete operation is failed.");
+		}
 		assertEquals(content['base_url'],spore.base_url)
+		
+		
+		
 	}
 	@Test
 	void testWithBaseUrl(){
+		
 		def jsonMissingBaseUrl = this.getClass().getResource("nobaseurl")
-		spore= feed(jsonMissingBaseUrl.path,'http://my_base.url/')
+		InputStream urlStream = jsonMissingBaseUrl.openStream();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(urlStream));
+		File j = new File("nobaseurl.json")
+		j.append(reader.getText())
+		String jsonString = j.text
+		def content=slurper.parseText(j.text)
+		spore= feed(j.path,'http://my_base.url/')
+		if(j.delete()){
+			System.out.println(j.getName() + " is deleted!");
+		}else{
+			System.out.println("Delete operation is failed.");
+		}
 		assertEquals(spore.base_url, 'http://my_base.url/')
 	}
 	@Test
 	void testGeneratedMethodsMatchDescritpionMethods(){
-		def jsonMissingBaseUrl = this.getClass().getResource("right.json")
-		InputStream urlStream = jsonMissingBaseUrl.openStream();
+	def correctJson = this.getClass().getResource("right.json")
+		InputStream urlStream = correctJson.openStream();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(urlStream));
-		def content=slurper.parse(reader)
-		spore= feed(jsonMissingBaseUrl.path,'http://my_base.url/')
+		File j = new File("newright.json")
+		j.append(reader.getText())
+		String jsonString = j.text
+		def content=slurper.parseText(j.text)
+		spore= feed(j.path,'http://my_base.url/')
+		if(j.delete()){
+			System.out.println(j.getName() + " is deleted!");
+		}else{
+			System.out.println("Delete operation is failed.");
+		}
 		content['methods'].each{k,v->
-		assertTrue spore.metaClass.methods*.name.contains(k)
+			assertTrue spore.metaClass.methods*.name.contains(k)
 		}
 	}
 }

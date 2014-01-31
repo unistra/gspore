@@ -8,6 +8,9 @@ class ThisTestSuite extends TestSuite{
 	public static TestSuite suite() throws Exception {
 		TestSuite suite = new TestSuite();
 		GroovyTestSuite gsuite = new GroovyTestSuite();
+		//bon ici tu peux pas faire le compile tout le temps, notamment 
+		//quand c'est appelé depuis un jar c'est uncool
+		//suite.addTestSuite(TestClientBuilder)
 		suite.addTestSuite(gsuite.compile(TEST_ROOT + "TestClientBuilder.groovy"));
 		suite.addTestSuite(gsuite.compile(TEST_ROOT + "TestClientGenerator.groovy"));
 		suite.addTestSuite(gsuite.compile(TEST_ROOT + "TestMethodAuthentication.groovy"));
