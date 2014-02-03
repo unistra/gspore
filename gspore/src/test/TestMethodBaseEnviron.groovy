@@ -75,7 +75,6 @@ class TestMethodBaseEnviron extends GroovyTestCase{
 			formats:" application/json",
 			
 		])
-		println "OUESCH3"+method.baseEnviron()."SCRIPT_NAME"
 		assertTrue method.baseEnviron()."SERVER_NAME"=="my_test.org"
 		assertTrue method.baseEnviron()."SERVER_PORT"==80
 		assertTrue method.baseEnviron().'wsgi.url_scheme'=="http"

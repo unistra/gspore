@@ -20,7 +20,7 @@
 	<classpathentry kind="lib" path="lib/http-builder-0.7-SNAPSHOT/dependencies/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/http-builder-0.7-SNAPSHOT/dependencies/ezmorph-1.0.6.jar"/>
 	<classpathentry kind="lib" path="lib/http-builder-0.7-SNAPSHOT/dependencies/groovy-1.8.8.jar"/>
-	<classpathentry kind="lib" path="lib/http-builder-0.7-SNAPSHOT/dependencies/httpclient-4.2.1.jar"/>
+	<classpathentry kind="lib" path="lib/http-builder-0.7-SNAPSHOT/dependencies/httpclient-4.2.1.jar" sourcepath="/home/geoffroy/.m2/repository/org/apache/httpcomponents/httpclient/4.2.1/httpclient-4.2.1-sources.jar"/>
 	<classpathentry kind="lib" path="lib/http-builder-0.7-SNAPSHOT/dependencies/httpcore-4.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/http-builder-0.7-SNAPSHOT/dependencies/json-lib-2.3-jdk15.jar"/>
 	<classpathentry kind="lib" path="lib/http-builder-0.7-SNAPSHOT/dependencies/nekohtml-1.9.16.jar"/>

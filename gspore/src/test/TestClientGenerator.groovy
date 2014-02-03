@@ -65,11 +65,7 @@ class TestClientGenerator extends GroovyTestCase{
 		String jsonString = j.text
 		def content=slurper.parseText(j.text)
 		spore = feed(j.path)
-		if(j.delete()){
-			System.out.println(j.getName() + " is deleted!");
-		}else{
-			System.out.println("Delete operation is failed.");
-		}
+		j.delete()
 		assertEquals(content['base_url'],spore.base_url)
 		
 		
@@ -86,11 +82,7 @@ class TestClientGenerator extends GroovyTestCase{
 		String jsonString = j.text
 		def content=slurper.parseText(j.text)
 		spore= feed(j.path,'http://my_base.url/')
-		if(j.delete()){
-			System.out.println(j.getName() + " is deleted!");
-		}else{
-			System.out.println("Delete operation is failed.");
-		}
+		j.delete()
 		assertEquals(spore.base_url, 'http://my_base.url/')
 	}
 	@Test
@@ -103,11 +95,7 @@ class TestClientGenerator extends GroovyTestCase{
 		String jsonString = j.text
 		def content=slurper.parseText(j.text)
 		spore= feed(j.path,'http://my_base.url/')
-		if(j.delete()){
-			System.out.println(j.getName() + " is deleted!");
-		}else{
-			System.out.println("Delete operation is failed.");
-		}
+		j.delete()
 		content['methods'].each{k,v->
 			assertTrue spore.metaClass.methods*.name.contains(k)
 		}

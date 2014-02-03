@@ -8,6 +8,7 @@ import errors.MethodCallError
 import static utils.MethodUtils.buildParams;
 
 class TestMethodRequiredParameters extends GroovyTestCase{
+	
 	/** Tests the value of the built parameters 
 	 *in case of required and optional 
 	 *parameters defined in description, and 

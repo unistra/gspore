@@ -8,6 +8,10 @@ class MethodUtils {
 	public static Map urlParse(base_url){
 		URL aURL = new URL(base_url)
 		URI aURI = new URI(base_url)
+		println aURL
+		println aURI
+		println aURL.getPath()
+		println aURI.getPath()
 		return [
 			"hostName":aURL.getHost(),
 			"serverPort":aURI.getPort(),
@@ -38,10 +42,10 @@ class MethodUtils {
 	 * @return the corrected path
 	 */
 	public static placeHoldersReplacer(req,path,method){
-		println "PATH"
 		Map queryString = req
 		String corrected=""
 		Map finalQuery=[:]
+		//If the path contains placeHolders marks
 		if (path.indexOf(':')!=-1){
 			corrected = path.split ('/').collect{it.startsWith(":")?req.find({k,v->k==it-(":")})?.value:it}.join('/')
 		}
@@ -53,6 +57,7 @@ class MethodUtils {
 				finalQuery[k]=v
 			}
 		}
+		println  "BONJOUR"
 		return [queryString:finalQuery,finalPath:corrected!=""?corrected:path]
 	}
 	/**For each effective request parameter, checks if it is registered under
@@ -70,7 +75,6 @@ class MethodUtils {
 				params+=it
 			}
 		}
-		println "PARAM"+param
 		if (param!="payload" &&!params.contains(param)){
 			throw new MethodCallError("Unregistered parameter")
 		}else{

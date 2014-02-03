@@ -71,17 +71,12 @@ class Method {
 		
 		def normalizedPath=path.split ('/').collect{it.trim()}-null-""
 		def formatedPathRemainder=path.replace('/'+(normalizedPath[0]),'')
-		/*println urlParse(base_url).hostName
-		println "MEC"+urlParse(base_url).path
-		println base_url
-		println path
-		println "1"+normalizedPath
-		println "2"+formatedPathRemainder*/
+	
 		return [
 			'REQUEST_METHOD': method,
 			'SERVER_NAME': urlParse(base_url).hostName,
 			'SERVER_PORT': urlParse(base_url).serverPort!=-1?urlParse(base_url).serverPort:base_url.startsWith('https')?443:base_url.startsWith('http')?80:'',
-			'SCRIPT_NAME': urlParse(base_url).path,//!=""?urlParse(base_url).path:normalizedPath.size()>0?('/'+(normalizedPath[0])):"",
+			'SCRIPT_NAME': urlParse(base_url).path,
 			'PATH_INFO': path,
 			'QUERY_STRING': "",
 			'HTTP_USER_AGENT': 'whatever',
@@ -109,7 +104,6 @@ class Method {
 		def (requiredParamsMissing,whateverElseMissing,errors,storedCallbacks)=[[], [], [], []]
 		def finalPath = placeHoldersReplacer(reqParams,path,this).finalPath
 		def queryString = placeHoldersReplacer(reqParams,path,this).queryString
-		println "FINALPATH"+finalPath
 		environ['QUERY_STRING']=queryString
 		environ['spore.params']=buildParams(reqParams,this)
 		environ['spore.payload']=buildPayload(reqParams,this)
@@ -134,7 +128,7 @@ class Method {
 			}
 			/**else (i.e if it is a groovy.lang.Closure)*/
 			else if (condition(environ)){
-				callback=middleware(environ)
+				callback = middleware(environ)
 			}
 			/**break loop
 			 */
@@ -196,8 +190,8 @@ class Method {
 			environ['base_url']=base_url
 			environ['method']=method
 			environ['finalPath']=finalPath
-			println "OoUiIiUiYEYhgcfc"+finalPath
 			environ['queryString']=queryString
+			
 			ret = requestSend(environ)
 		}
 
@@ -243,7 +237,7 @@ class Method {
 	def contentTypesNormalizer(){
 		def normalized
 		def format=formats?:global_formats
-		normalized=contentTypes[format.class==java.lang.String?format.toUpperCase():format[0].toUpperCase()]
+		normalized=contentTypes[format.class==java.lang.String?format.toUpperCase():format[0].toUpperCase()]?:format
 	}
 	/**
 	 * @return in this order
@@ -259,6 +253,6 @@ class Method {
 	def contentTypesNormalizer(args){
 		def normalized
 		def format=args['spore.format']?:formats?:global_formats
-		normalized=format.class==groovyx.net.http.ContentType?format:contentTypes[format.class=java.lang.String?format.toUpperCase():format[0].toUpperCase()]
+		normalized=format.class==groovyx.net.http.ContentType?format:contentTypes[format.class==java.lang.String?format.toUpperCase():format[0].toUpperCase()]
 	}
 }

@@ -22,14 +22,17 @@ class Request {
 	
 	public static String requestSend(args){
 		def ret=""
-		builder.request(finalUrl(args),methods[args['method']],contentTypesNormalizer(args)) {
+		def URL=finalUrl(args)
+		builder.request(URL,methods[args['method']],contentTypesNormalizer(args)) {
 				uri.path = args['finalPath'][1..-1]
 				uri.query = args['queryString']
 				args["spore.headers"].each{k,v->
 					headers."$k"="$v"
 				}
+				println uri
 				headers.'User-Agent' = 'Satanux/5.0'
 				headers.Accept=contentTypesNormalizer(args)
+				println request
 				if (["POST", "PUT", "PATCH"].contains(request.method)){
 					send contentTypesNormalizer(args),args['spore.payload']
 				}
@@ -45,6 +48,7 @@ class Request {
 					ret+="request failure"+" : "+statusCode
 				}
 			}
+		
 		return ret
 	}
 	public static finalUrl(args){
@@ -53,9 +57,14 @@ class Request {
 	public static String domainNameAndServerPort(domainName,serverPort){
 		def ret
 		if(domainName.indexOf(':')==-1){
+			println "IF"
+			println "serverPort"+serverPort
 			ret=domainName+":"+serverPort
 		}
-		else ret=domainName
+		else {
+			println "ELSE"
+			ret=domainName
+		}
 	}
 	/**
 	 * @return in this order
@@ -71,7 +80,7 @@ class Request {
 	def static contentTypesNormalizer(args){
 		def normalized
 		def format=args['spore.format']?:args['formats']?:args['global_formats']
-		normalized=format.class==groovyx.net.http.ContentType?format:args['contentTypes'][format.class=java.lang.String?format.toUpperCase():args['formats'][0].toUpperCase()]
+		normalized=format.class==groovyx.net.http.ContentType?format:contentTypes[format.class==java.lang.String?format.toUpperCase():args['formats'][0].toUpperCase()]?:format
 	}
 
 }

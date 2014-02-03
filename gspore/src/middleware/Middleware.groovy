@@ -18,7 +18,6 @@ class Middleware {
 		
 		def ret=this?."$methodName"(params)
 		
-		
 		return ret
 	}
 }

@@ -91,7 +91,6 @@ class Spore {
 	 */
 	def createMethod(parsedJson)throws MethodError{
 		def checkResult = methodIntegrityCheck(parsedJson)
-		println checkResult
 		if (checkResult==true){
 			return new Method(parsedJson)
 		}else{
