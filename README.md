@@ -38,10 +38,8 @@ the Middleware should be enabled*
 
 >**SporeFeeder feed = new SporeFeeder();**
 		
->**Object o = feed.feed("/pathToMyJson/test.json");**
+>**Spore spore = feed.feed("/pathToMyJson/test.json");**
 		
->**Spore spore = (Spore)o;**
-
 >*//Instanciate Middleware from hard-coded class*
 
 >**Jazzleware j = new Jazzleware();**
