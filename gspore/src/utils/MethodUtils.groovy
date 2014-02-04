@@ -8,10 +8,6 @@ class MethodUtils {
 	public static Map urlParse(base_url){
 		URL aURL = new URL(base_url)
 		URI aURI = new URI(base_url)
-		println aURL
-		println aURI
-		println aURL.getPath()
-		println aURI.getPath()
 		return [
 			"hostName":aURL.getHost(),
 			"serverPort":aURI.getPort(),
@@ -21,13 +17,12 @@ class MethodUtils {
 			"scheme":aURI.getScheme()
 		]
 	}
-
 	/**pop ["payload"]from parameters and add payload to environ
 	 * @param p : the request effective parameters
 	 * @return the payload
 	 */
 	public static buildPayload(p,method){
-		def entry = p["payload"]
+		def entry = p["payload"]?:null
 		if (method.required_payload && !entry) throw new MethodCallError('Payload is required for this function')
 		p.remove("payload")
 		return entry
@@ -45,10 +40,11 @@ class MethodUtils {
 		Map queryString = req
 		String corrected=""
 		Map finalQuery=[:]
-		//If the path contains placeHolders marks
+		/**If the path contains placeHolders marks*/
 		if (path.indexOf(':')!=-1){
 			corrected = path.split ('/').collect{it.startsWith(":")?req.find({k,v->k==it-(":")})?.value:it}.join('/')
 		}
+		/**Removal of placeHolders in the finalPath*/
 		def usedToBuildFinalPath=path.split ('/').findAll{it.startsWith(":")}.collect{
 			it.replace(':','')
 		}
@@ -57,7 +53,6 @@ class MethodUtils {
 				finalQuery[k]=v
 			}
 		}
-		println  "BONJOUR"
 		return [queryString:finalQuery,finalPath:corrected!=""?corrected:path]
 	}
 	/**For each effective request parameter, checks if it is registered under

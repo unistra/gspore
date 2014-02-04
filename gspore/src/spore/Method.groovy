@@ -68,10 +68,10 @@ class Method {
 	 * request modifications
 	 */
 	def baseEnviron(){
-		
+
 		def normalizedPath=path.split ('/').collect{it.trim()}-null-""
 		def formatedPathRemainder=path.replace('/'+(normalizedPath[0]),'')
-	
+
 		return [
 			'REQUEST_METHOD': method,
 			'SERVER_NAME': urlParse(base_url).hostName,
@@ -96,7 +96,7 @@ class Method {
 	 */
 	def request={reqParams->
 
-		boolean noRequest=false
+		
 		Map environ = baseEnviron()
 		Map modifiedEnvirons = [:]
 		Map middlewareModifiedEnviron=[:]
@@ -105,9 +105,109 @@ class Method {
 		def finalPath = placeHoldersReplacer(reqParams,path,this).finalPath
 		def queryString = placeHoldersReplacer(reqParams,path,this).queryString
 		environ['QUERY_STRING']=queryString
+		environ['base_url']=base_url
+		environ['method']=method
+		environ['finalPath']=finalPath
 		environ['spore.params']=buildParams(reqParams,this)
 		environ['spore.payload']=buildPayload(reqParams,this)
+		
+		/**Loop that breaks if a Response
+		 * is found. Can modify any of the keys and
+		 * values of the request's base environment
+		 * or create new ones, via middleware logic
+		 * and store callbacks intended on modifying
+		 * the response
+		 */
+		def afterLoopMap=  middlewareBrowser(delegate.middlewares,environ,storedCallbacks,ret)
+		
+		ret = afterLoopMap.ret
+		environ = afterLoopMap.environ
+		
+		/**Resolution of the stored callbacks,
+		 * which should be either reflect.Methods
+		 * either Closures,
+		 * in reverse order.
+		 */
+		afterLoopMap.storedCallbacks.reverseEach{
+			if (it.class==java.lang.reflect.Method){
+				def declaringClass = it.getDeclaringClass()
+				Object obj = declaringClass.newInstance([:])
+				it.invoke(obj, environ)
+			}else{
+				it(environ)
+			}
+		}
 
+		/**From here environ is not 
+		 *modified anymore
+		 *that's where missing
+		 *or exceeding parameters
+		 *errors can be raised.
+		 **/
+		if (afterLoopMap.noRequest==false){
+			required_params.each{
+				if (!reqParams.containsKey(it) &&  ! environ['spore.params'].containsKey(it)){
+					requiredParamsMissing+=it
+				}
+			}
+			[
+				requiredParamsMissing,
+				whateverElseMissing
+			].each() {
+				!it.empty?errors+=it:''
+			}
+			if(errors.size()>0){
+				throw new MethodCallError("required param missing : $errors")
+			}
+		}
+		/**Effective processing of the request
+		 * */
+		if (errors.size()==0 && afterLoopMap.noRequest==false){
+			
+			ret = requestSend(environ)
+		}
+
+		if (!requiredParamsMissing.empty){
+			ret=""
+			requiredParamsMissing.each{
+				ret += "$it is missing for $name"
+				environ["spore.errors"]?environ["spore.errors"]+="$it is missing for $name":(environ["spore.errors"]="$it is missing for $name")
+			}
+		}
+		return ret
+	}
+	/**The no-parameter version of 
+	 *contentTypesNormalizer is used
+	 *only when generating the
+	 *base environment of the request
+	 * @return a content-type
+	 * 
+	 */
+	def contentTypesNormalizer(){
+		def normalized
+		def format=formats?:global_formats
+		normalized=contentTypes[format?.class==java.lang.String?format.toUpperCase():format[0].toUpperCase()]?:format
+	}
+	/**
+	 * @return in this order
+	 * the content-type specified
+	 * in the environ (so that if it has
+	 * been modified by whatever middleware,
+	 * it is taken in account), 
+	 * the specific content type
+	 * for this method, or would it be missing,
+	 *  the global_format which 
+	 * is inherited from the spore.
+	 */
+	def contentTypesNormalizer(args){
+		def normalized
+		def format=args['spore.format']?:formats?:global_formats
+		//voilà ici, c'est naze tu dois t'en débarasser
+		normalized=format.class==groovyx.net.http.ContentType?format:contentTypes[format.class==java.lang.String?format.toUpperCase():format[0].toUpperCase()]
+	}
+	
+	def middlewareBrowser(middlewares,environ,storedCallbacks,ret){
+		boolean noRequest=false
 		/**rather not idiomatic breakable loop that
 		 * calls middlewares. Breaks if a Response
 		 * is found. Can modify any of the keys and
@@ -116,14 +216,14 @@ class Method {
 		 * and store callbacks intended on modifying
 		 * the response
 		 * */
-		delegate.middlewares.find{condition,middleware->
+		middlewares.find{condition,middleware->
 			def callback
 			/**If the condition was written in Java*/
 			if (condition.class == java.lang.reflect.Method){
 				def declaringClass = condition.getDeclaringClass()
 				Object obj = declaringClass.newInstance([:])
 				if (condition.invoke(obj,environ)){
-					callback =        middleware.call(environ)
+					callback = middleware.call(environ)
 				}
 			}
 			/**else (i.e if it is a groovy.lang.Closure)*/
@@ -144,115 +244,7 @@ class Method {
 			/**pass control to next middleware*/
 			return false
 		}
-
-		/**Resolution of the stored callbacks,
-		 * which should be either reflect.Methods
-		 * either Closures,
-		 * in reverse order.
-		 */
-		storedCallbacks.reverseEach{
-			if (it.class==java.lang.reflect.Method){
-				def declaringClass = it.getDeclaringClass()
-				Object obj = declaringClass.newInstance([:])
-				it.invoke(obj, environ)
-			}else{
-				it(environ)
-			}
-		}
-
-		/**From here environ is not 
-		 *modified anymore
-		 *that's where missing
-		 *or exceeding parameters
-		 *errors can be raised.
-		 **/
-		if (noRequest==false){
-			required_params.each{
-				if (!reqParams.containsKey(it) &&  ! environ['spore.params'].containsKey(it)){
-					requiredParamsMissing+=it
-				}
-			}
-			[
-				requiredParamsMissing,
-				whateverElseMissing
-			].each() {
-				!it.empty?errors+=it:''
-			}
-			if(errors.size()>0){
-				throw new MethodCallError("required param missing : $errors")
-			}
-		}
-		/**Effective processing of the request
-		 * */
-		if (errors.size()==0 && noRequest==false){
-			//il faut voir pour remonter ça avec le reste
-			//parce tout ce qu'il y a là doit pouvoir être réécrit
-			environ['base_url']=base_url
-			environ['method']=method
-			environ['finalPath']=finalPath
-			environ['queryString']=queryString
-			
-			ret = requestSend(environ)
-		}
-
-		if (!requiredParamsMissing.empty){
-			ret=""
-			requiredParamsMissing.each{
-				ret += "$it is missing for $name"
-				environ["spore.errors"]?environ["spore.errors"]+="$it is missing for $name":(environ["spore.errors"]="$it is missing for $name")
-			}
-		}
-		return ret
-	}
-	
-	
-	/**No success with that by that point
-	 * 
-	 */
-	def javaOrGroovyCall(condition,environ,middleware){
-		def callback
-		if (condition.class == java.lang.reflect.Method){
-			def declaringClass = condition.getDeclaringClass()
-			Object obj = declaringClass.newInstance([:])
-			if (condition.invoke(obj,environ)){
-				if (middleware){
-					callback =	middleware.call(environ)
-				}
-			}
-			else if (condition(environ)){
-				if (middleware){
-					callback=middleware(environ)
-				}
-			}
-		}
-		return callback?callback:null
-	}
-	/**The no-parameter version of 
-	 *contentTypesNormalizer is used
-	 *only when generating the
-	 *base environment of the request
-	 * @return a content-type
-	 * 
-	 */
-	def contentTypesNormalizer(){
-		def normalized
-		def format=formats?:global_formats
-		normalized=contentTypes[format.class==java.lang.String?format.toUpperCase():format[0].toUpperCase()]?:format
-	}
-	/**
-	 * @return in this order
-	 * the content-type specified
-	 * in the environ (so that if it has
-	 * been modified by whatever middleware,
-	 * it is taken in account), 
-	 * the specific content type
-	 * for this method, or would it be missing,
-	 *  the global_format which 
-	 * is inherited from the spore.
-	 */
-	def contentTypesNormalizer(args){
-		def normalized
-		def format=args['spore.format']?:formats?:global_formats
-		normalized=format.class==groovyx.net.http.ContentType?format:contentTypes[format.class==java.lang.String?format.toUpperCase():format[0].toUpperCase()]
+		//return noRequest
+		return ["noRequest":noRequest,"environ":environ,"storedCallbacks":storedCallbacks,"ret":ret]
 	}
 }
