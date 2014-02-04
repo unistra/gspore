@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import request.Response
-import static middleware.MiddlewareBrowser.*;
 import static utils.MethodUtils.urlParse
 import static utils.MethodUtils.placeHoldersReplacer
 import static utils.MethodUtils.buildPayload;
@@ -62,16 +61,13 @@ class Method {
 			}
 		}
 	}
-
 	/**@return Request environment 
 	 * before middleware or effective 
 	 * request modifications
 	 */
 	def baseEnviron(){
-
 		def normalizedPath=path.split ('/').collect{it.trim()}-null-""
 		def formatedPathRemainder=path.replace('/'+(normalizedPath[0]),'')
-
 		return [
 			'REQUEST_METHOD': method,
 			'SERVER_NAME': urlParse(base_url).hostName,
@@ -110,7 +106,6 @@ class Method {
 		environ['finalPath']=finalPath
 		environ['spore.params']=buildParams(reqParams,this)
 		environ['spore.payload']=buildPayload(reqParams,this)
-		
 		/**Loop that breaks if a Response
 		 * is found. Can modify any of the keys and
 		 * values of the request's base environment
@@ -119,10 +114,8 @@ class Method {
 		 * the response
 		 */
 		def afterLoopMap=  middlewareBrowser(delegate.middlewares,environ,storedCallbacks,ret)
-		
 		ret = afterLoopMap.ret
 		environ = afterLoopMap.environ
-		
 		/**Resolution of the stored callbacks,
 		 * which should be either reflect.Methods
 		 * either Closures,
@@ -137,7 +130,6 @@ class Method {
 				it(environ)
 			}
 		}
-
 		/**From here environ is not 
 		 *modified anymore
 		 *that's where missing
@@ -163,10 +155,8 @@ class Method {
 		/**Effective processing of the request
 		 * */
 		if (errors.size()==0 && afterLoopMap.noRequest==false){
-			
 			ret = requestSend(environ)
 		}
-
 		if (!requiredParamsMissing.empty){
 			ret=""
 			requiredParamsMissing.each{
@@ -206,7 +196,7 @@ class Method {
 		normalized=format.class==groovyx.net.http.ContentType?format:contentTypes[format.class==java.lang.String?format.toUpperCase():format[0].toUpperCase()]
 	}
 	
-	def middlewareBrowser(middlewares,environ,storedCallbacks,ret){
+	public static def middlewareBrowser(middlewares,environ,storedCallbacks,ret){
 		boolean noRequest=false
 		/**rather not idiomatic breakable loop that
 		 * calls middlewares. Breaks if a Response

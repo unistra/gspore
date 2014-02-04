@@ -13,74 +13,60 @@ import groovy.json.JsonException
 import spore.Method;
 import spore.Spore
 import errors.MethodError
+import static spore.Method.middlewareBrowser
 
 class TestMiddlewaresCallbacks extends GroovyTestCase{
 
 	@Test
 	void testSimpleClosureReturningMiddleware(){
+		def storedCallbacks=[]
 		Spore spore = new Spore([
-		'name':'name',
-		'base_url':'http://localhost:8080/',
-		'methods':[
-			"method1" : [
-				"path" : "/target/method1",
-				"method" : "POST",
-				"formats":"application/json"
-			],
-			"method2" : [
-				"path" : "/target/method2",
-				"method" : "GET",
-				"formats":"application/json"
+			'name':'name',
+			'base_url':'http://localhost:8080/',
+			'methods':[
+				"method1" : [
+					"path" : "/target/method1",
+					"method" : "POST",
+					"formats":"application/json"
+				]
 			]
-		]
-	])
-		spore.enable(
-			middleware.Middleware,
-			[
-				processRequest:{args->
-					args['spore.headers'] = ["Authorization":64536546]
-					return { "blabla" }
-				}
-			]
-			)
-		spore.enable(
-			middleware.Middleware,
-			[
-				processRequest:{args->
-					args['spore.headers'] = ["Authorization":64536546]
-					return { "blabla" }
-				}
-				
-			]
-			)
-		spore.middlewares.find{condition,middleware->
-			def callback
-			/**If the condition was written in Java*/
-			if (condition.class == java.lang.reflect.Method){
-				def declaringClass = condition.getDeclaringClass()
-				Object obj = declaringClass.newInstance([:])
-				if (condition.invoke(obj,environ)){
-					callback =        middleware.call(environ)
-				}
-			}
-			/**else (i.e if it is a groovy.lang.Closure)*/
-			else if (condition(environ)){
-				callback = middleware(environ)
-			}
-			/**break loop
-			 */
-			if (callback in Response){
-				noRequest=true
-				ret = callback(environ)
-				return true
-			}
-			/**store to process after request*/
-			if (callback!=null){
-				storedCallbacks+=callback
-			}
-			/**pass control to next middleware*/
-			return false
-		}
-	}
+		])
+		Method methoda = new Method([
+			name:"method2",
+			base_url:"http://my_test.org",
+			path:"/test",
+			method:'GET',
+			formats:" application/json",
 
+		])
+		def environ= methoda.baseEnviron()
+		spore.enable(
+				middleware.Middleware,
+				[
+					processRequest:{args->
+						args['spore.headers'] = ["Authorization":64536546]
+						return { "blabla" }
+					}
+				]
+				)
+
+		spore.enable(
+				middleware.Middleware,
+				[
+					processRequest:{args->
+						args['spore.headers'] = ["Authorization":64536546]
+						return { "blabla" }
+					}
+
+				]
+				)
+		
+			def results = middlewareBrowser(spore.middlewares,environ,storedCallbacks,"")
+			storedCallbacks = results.storedCallbacks
+		println storedCallbacks
+		assertTrue storedCallbacks.size()==2
+		assertTrue storedCallbacks[0] in Closure
+		assertTrue storedCallbacks[1] in Closure
+		
+	}
 }
