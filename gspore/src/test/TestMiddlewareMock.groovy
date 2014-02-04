@@ -1,13 +1,11 @@
 package test
 
+import spore.Spore;
 import org.junit.Test
-
 import groovy.util.GroovyTestCase
 import static feed.SporeFeeder.feed
-
 import java.net.UnknownHostException
 import java.io.FileNotFoundException
-
 import groovy.json.JsonSlurper
 import groovy.json.JsonException
 import spore.Method;
@@ -15,22 +13,22 @@ import spore.Spore
 import errors.MethodError
 import static spore.Method.middlewareBrowser
 
-class TestMiddlewaresCallbacks extends GroovyTestCase{
-
-	@Test
-	void testSimpleClosureReturningMiddleware(){
-		def storedCallbacks=[]
-		Spore spore = new Spore([
-			'name':'name',
-			'base_url':'http://localhost:8080/',
-			'methods':[
-				"method1" : [
-					"path" : "/target/method1",
-					"method" : "POST",
-					"formats":"application/json"
-				]
+class TestMiddlewareMock extends GroovyTestCase {
+	Spore spore = new Spore([
+		'name':'name',
+		'base_url':'http://localhost:8080/',
+		'methods':[
+			"method1" : [
+				"path" : "/target/method1",
+				"method" : "POST",
+				"formats":"application/json"
 			]
-		])
+		]
+	])
+	@Test
+	void testMiddlewareMock(){
+		def storedCallbacks=[]
+
 		Method methoda = new Method([
 			name:"method2",
 			base_url:"http://my_test.org",
@@ -40,7 +38,7 @@ class TestMiddlewaresCallbacks extends GroovyTestCase{
 
 		])
 		def environ= methoda.baseEnviron()
-		spore.enable(
+		spore.enableIf(
 				middleware.Middleware,
 				[
 					processRequest:{args->
@@ -48,24 +46,27 @@ class TestMiddlewaresCallbacks extends GroovyTestCase{
 						return { "blabla" }
 					}
 				]
-				)
-
+				){args->
+					args['REQUEST_METHOD']=="GET"
+				}
+		def expected_response={
+			[
+				text:'OK',
+				status_code:200,
+				headers:['Content-Type': 'text-plain']
+			]
+		}
 		spore.enable(
-				middleware.Middleware,
+				middleware.Mock,
 				[
-					processRequest:{args->
-						args['spore.headers'] = ["Authorization":64536546]
-						return { "blabla" }
-					}
-
+					fakes:[
+						'/method2':
+						expected_response()
+					]
 				]
 				)
-		
 		def results = middlewareBrowser(spore.middlewares,environ,storedCallbacks,"")
-		storedCallbacks = results.storedCallbacks
-		assertTrue storedCallbacks.size()==2
-		assertTrue storedCallbacks[0] in Closure
-		assertTrue storedCallbacks[1] in Closure
 		
+		assertTrue results.ret == ['headers':['Content-Type':'text-plain'], 'status_code':200, 'text':'OK']
 	}
 }
