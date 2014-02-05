@@ -22,33 +22,36 @@ class Request {
 	
 	public static String requestSend(args){
 		def ret=""
-		def URL=finalUrl(args)
-		builder.request(URL,methods[args['method']],contentTypesNormalizer(args)) {
-				uri.path = args['finalPath'][1..-1]
-				uri.query = args['queryString']
-				args["spore.headers"].each{k,v->
-					headers."$k"="$v"
-				}
-				println uri
-				headers.'User-Agent' = 'Satanux/5.0'
-				headers.Accept=contentTypesNormalizer(args)
-				println request
-				if (["POST", "PUT", "PATCH"].contains(request.method)){
-					send contentTypesNormalizer(args),args['spore.payload']
-				}
-				response.success =  {resp,json->
-					String statusCode=String?.valueOf(resp.statusLine.statusCode)
-					ret += json
-					ret+=" : "
-					ret+=statusCode
-				}
-
-				response.failure ={resp->
-					String statusCode=String?.valueOf(resp.statusLine.statusCode)
-					ret+="request failure"+" : "+statusCode
+		def defaultBehavior={resp,json->
+				String statusCode=String?.valueOf(resp.statusLine.statusCode)
+				if (args['success'] ){
+					ret = args['success'](resp,json)
+				}else{
+				ret += json
+				ret+=" : "
+				ret+=statusCode
 				}
 			}
 		
+		builder.handler.success=defaultBehavior
+		def URL=finalUrl(args)
+		builder.request(URL,methods[args['method']],contentTypesNormalizer(args)) {
+			uri.path = args['finalPath'].startsWith('/')?args['finalPath'][1..-1]:args['finalPath'].startsWith('/')
+			uri.query = args['queryString']
+			args["spore.headers"].each{k,v->
+				headers."$k"="$v"
+			}
+			headers.'User-Agent' = 'Satanux/5.0'
+			headers.'Accept'=contentTypesNormalizer(args)
+			if (["POST", "PUT", "PATCH"].contains(request.method)){
+				send contentTypesNormalizer(args),args['spore.payload']
+			}
+			response.failure ={resp->
+				String statusCode=String?.valueOf(resp.statusLine.statusCode)
+				ret+="request failure"+" : "+statusCode
+			}
+		}
+
 		return ret
 	}
 	public static finalUrl(args){
@@ -57,12 +60,9 @@ class Request {
 	public static String domainNameAndServerPort(domainName,serverPort){
 		def ret
 		if(domainName.indexOf(':')==-1){
-			println "IF"
-			println "serverPort"+serverPort
 			ret=domainName+":"+serverPort
 		}
 		else {
-			println "ELSE"
 			ret=domainName
 		}
 	}
@@ -76,6 +76,8 @@ class Request {
 	 * for this method, or would it be missing,
 	 *  the global_format which
 	 * is inherited from the spore.
+	 * And is useless now. Just rewrite it, or
+	 * remove it, please.
 	 */
 	def static contentTypesNormalizer(args){
 		def normalized

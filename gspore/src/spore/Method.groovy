@@ -94,8 +94,7 @@ class Method {
 
 		
 		Map environ = baseEnviron()
-		Map modifiedEnvirons = [:]
-		Map middlewareModifiedEnviron=[:]
+		Map responseClosures=[:]
 		def ret = ""
 		def (requiredParamsMissing,whateverElseMissing,errors,storedCallbacks)=[[], [], [], []]
 		def finalPath = placeHoldersReplacer(reqParams,path,this).finalPath
@@ -116,20 +115,30 @@ class Method {
 		def afterLoopMap=  middlewareBrowser(delegate.middlewares,environ,storedCallbacks,ret)
 		ret = afterLoopMap.ret
 		environ = afterLoopMap.environ
+		println "OUAIS"+afterLoopMap.environ
+		
 		/**Resolution of the stored callbacks,
 		 * which should be either reflect.Methods
 		 * either Closures,
 		 * in reverse order.
+		 * 
 		 */
 		afterLoopMap.storedCallbacks.reverseEach{
 			if (it.class==java.lang.reflect.Method){
 				def declaringClass = it.getDeclaringClass()
 				Object obj = declaringClass.newInstance([:])
 				it.invoke(obj, environ)
+				responseClosures['success']=it
 			}else{
-				it(environ)
+				//it(environ)
+				//println it(environ)
+				responseClosures['success']=it
 			}
+			
 		}
+		
+		println responseClosures
+		
 		/**From here environ is not 
 		 *modified anymore
 		 *that's where missing
@@ -152,11 +161,17 @@ class Method {
 				throw new MethodCallError("required param missing : $errors")
 			}
 		}
+		
+		
 		/**Effective processing of the request
 		 * */
 		if (errors.size()==0 && afterLoopMap.noRequest==false){
+			responseClosures.each{clef,valeur->
+				environ[clef]=valeur
+			}
 			ret = requestSend(environ)
 		}
+		
 		if (!requiredParamsMissing.empty){
 			ret=""
 			requiredParamsMissing.each{
@@ -234,7 +249,6 @@ class Method {
 			/**pass control to next middleware*/
 			return false
 		}
-		//return noRequest
 		return ["noRequest":noRequest,"environ":environ,"storedCallbacks":storedCallbacks,"ret":ret]
 	}
 }

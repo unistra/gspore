@@ -44,11 +44,7 @@ class TestClientGenerator extends GroovyTestCase{
 			String jsonString = j.text
 			def content=slurper.parseText(j.text)
 			feed(j.path)
-			if(j.delete()){
-				System.out.println(j.getName() + " is deleted!");
-			}else{
-				System.out.println("Delete operation is failed.");
-			}
+			j.delete()
 		}catch (JsonException j){
 			errorMessage=j.getMessage()
 		}
