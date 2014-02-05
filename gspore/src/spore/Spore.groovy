@@ -51,6 +51,7 @@ class Spore {
 		 * */
 		args?."methods".each(){methodName,value->
 			try{
+				//println "ouais"+![null, ""].contains(value['base_url'])?value['base_url']:base_url
 				methods+=methodName
 				def m = createMethod([
 					name:methodName,

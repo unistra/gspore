@@ -69,7 +69,6 @@ class TestClientGenerator extends GroovyTestCase{
 	}
 	@Test
 	void testWithBaseUrl(){
-		
 		def jsonMissingBaseUrl = this.getClass().getResource("nobaseurl")
 		InputStream urlStream = jsonMissingBaseUrl.openStream();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(urlStream));

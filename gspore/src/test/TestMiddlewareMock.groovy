@@ -63,6 +63,51 @@ class TestMiddlewareMock extends GroovyTestCase {
 						'/method2':
 						expected_response()
 					]
+					
+				]
+				)
+		def results = middlewareBrowser(spore.middlewares,environ,storedCallbacks,"")
+		
+		assertTrue results.ret == ['headers':['Content-Type':'text-plain'], 'status_code':200, 'text':'OK']
+	}
+	@Test
+	void testJiddlewareJMock(){
+		def storedCallbacks=[]
+
+		Method methoda = new Method([
+			name:"method2",
+			base_url:"http://my_test.org",
+			path:"/test",
+			method:'GET',
+			formats:" application/json",
+
+		])
+		def environ= methoda.baseEnviron()
+		spore.enableIf(
+				middleware.Middleware,
+				[
+					processRequest:{args->
+						args['spore.headers'] = ["Authorization":64536546]
+						return { "blabla" }
+					}
+				]
+				){args->
+					args['REQUEST_METHOD']=="GET"
+				}
+		def expected_response={
+			[
+				text:'OK',
+				status_code:200,
+				headers:['Content-Type': 'text-plain']
+			]
+		}
+		spore.enable(
+				middleware.JMock,
+				[
+					fakes:[
+						'/method2':
+						expected_response()
+					]
 				]
 				)
 		def results = middlewareBrowser(spore.middlewares,environ,storedCallbacks,"")

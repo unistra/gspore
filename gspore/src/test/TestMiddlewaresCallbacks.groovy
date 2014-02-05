@@ -16,7 +16,10 @@ import errors.MethodError
 import static spore.Method.middlewareBrowser
 
 class TestMiddlewaresCallbacks extends GroovyTestCase{
-
+	@Test
+	void testResponseRewrittingMiddleware(){
+		
+	}
 	@Test
 	void testSimpleClosureReturningMiddleware(){
 		def storedCallbacks=[]

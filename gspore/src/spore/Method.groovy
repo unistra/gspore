@@ -137,7 +137,6 @@ class Method {
 			
 		}
 		
-		println responseClosures
 		
 		/**From here environ is not 
 		 *modified anymore
