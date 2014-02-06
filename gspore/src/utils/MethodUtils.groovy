@@ -45,17 +45,25 @@ class MethodUtils {
 
 		/**If the path contains placeHolders marks*/
 		println path
+		def correctedList=[]
+		def keys=[]
+		def gotReplaced=[]
 		if (path.contains(':')){
-			def correctedList=[]
+			
 			/**For each component delimited by a slash*/
 			path.split ('/').each{
 				def correctedElement=""
 				/**if it contains multipleplaceholders*/
 				if (it.contains('.') && it.contains(':')){
-					println it.split (/\./).collect{it.indexOf(':')!=-1?req.find({k,v->k==it-(":")})?.value:it}.join('.')
+					
 					correctedElement= it.split (/\./).collect{it.indexOf(':')!=-1?req.find({k,v->k==it-(":")})?.value:it}.join('.')
-				}else if (it.contains(':')){
+					it.split (/\./).each{
+						gotReplaced+=it.replace(':','')
+					}
+					}else if (it.contains(':')){
+				
 					correctedElement=req.find({k,v->k==it-(":")})?.value
+					gotReplaced+=it.replace(':','')
 				}else{
 				correctedElement=it
 				}
@@ -63,13 +71,8 @@ class MethodUtils {
 			}
 			corrected=correctedList.join('/')
 		}
-
-		/**Removal of placeHolders in the finalPath*/
-		def usedToBuildFinalPath=path.split ('/').findAll{it.startsWith(":")}.collect{
-			it.replace(':','')
-		}
 		queryString.each{k,v->
-			if (param(k,method) && ! usedToBuildFinalPath.contains(k)){
+			if (param(k,method) && ! gotReplaced.contains(k)){
 				finalQuery[k]=v
 			}
 		}

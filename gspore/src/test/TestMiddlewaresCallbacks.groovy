@@ -20,29 +20,8 @@ import static utils.MethodUtils.placeHoldersReplacer
 class TestMiddlewaresCallbacks extends GroovyTestCase{
 	@Test
 	void testResponseRewrittingMiddleware(){
-		
 	}
-	@Test
-	void testTests(){
-		Method methoda = new Method([
-			name:"method2",
-			base_url:"http://my_test.org",
-			
-			path:"/test/:unelementdurl/:username.:format",
-			method:'GET',
-			required_params : [
-				"format",
-				"username",
-				"unelementdurl"
-			],
-			formats:" application/json",
 
-		])
-		println placeHoldersReplacer(['format':'json','username':'keven',"unelementdurl":"bla"],methoda.path,methoda).queryString
-		println placeHoldersReplacer(['format':'json','username':'keven',"unelementdurl":"bla"],methoda.path,methoda).finalPath
-		
-		
-	}
 	@Test
 	void testSimpleClosureReturningMiddleware(){
 		def storedCallbacks=[]
@@ -88,12 +67,12 @@ class TestMiddlewaresCallbacks extends GroovyTestCase{
 
 				]
 				)
-		
+
 		def results = middlewareBrowser(spore.middlewares,environ,storedCallbacks,"")
 		storedCallbacks = results.storedCallbacks
 		assertTrue storedCallbacks.size()==2
 		assertTrue storedCallbacks[0] in Closure
 		assertTrue storedCallbacks[1] in Closure
-		
+
 	}
 }
