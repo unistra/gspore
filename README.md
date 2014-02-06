@@ -56,7 +56,7 @@ the Middleware should be enabled*
 		
 >**Spore spore = feed.feed("/pathToMyJson/test.json");**
 		
-git>*//Instanciate Middleware from hard-coded class*
+>*//Instanciate Middleware from hard-coded class*
 
 >**Jazzleware j = new Jazzleware();**
 
