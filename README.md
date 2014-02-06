@@ -1,6 +1,21 @@
 gspore
 ======
 
+>Gspore is intended on being used as a .jar which is 
+>sufficient to allow java or groovy application that include it to consume >SPORE implementing webservices.  
+
+>It allows the consuming app to instanciate 
+>spore clients on the basis of api descriptions and to use them. Clients >are generated with a set of class methods that matches the set of >functionalities described in the api description, all of which are indeed >callable, and send actual HTTP requests constructed according to the
+>specification.  
+
+>The raw features of the spore client and it's 
+>dynamically generated methods can be customized by the middlewares, 
+>which are specific workflow rewriters that are added on client scope,
+>but can be enabled in a conditional fashion.
+
+
+
+
 SPORE CLIENT 
 ------------
 
@@ -40,7 +55,7 @@ the Middleware should be enabled*
 		
 >**Spore spore = feed.feed("/pathToMyJson/test.json");**
 		
->*//Instanciate Middleware from hard-coded class*
+git>*//Instanciate Middleware from hard-coded class*
 
 >**Jazzleware j = new Jazzleware();**
 
