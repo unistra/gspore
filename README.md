@@ -5,7 +5,8 @@ gspore
 >sufficient to allow java or groovy application that include it to consume >SPORE implementing webservices.  
 
 >It allows the consuming app to instanciate 
->spore clients on the basis of api descriptions and to use them. Clients >are generated with a set of class methods that matches the set of >functionalities described in the api description, all of which are indeed >callable, and send actual HTTP requests constructed according to the
+>spore clients on the basis of api descriptions and to use them.
+>Clients are generated with a set of class methods that matches the set of >functionalities described in the api description, all of which are indeed >callable, and send actual HTTP requests constructed according to the
 >specification.  
 
 >The raw features of the spore client and it's 
