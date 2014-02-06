@@ -2,6 +2,8 @@ package utils
 
 import java.util.Map;
 import errors.MethodCallError
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 class MethodUtils {
 
@@ -40,10 +42,28 @@ class MethodUtils {
 		Map queryString = req
 		String corrected=""
 		Map finalQuery=[:]
+
 		/**If the path contains placeHolders marks*/
-		if (path.indexOf(':')!=-1){
-			corrected = path.split ('/').collect{it.startsWith(":")?req.find({k,v->k==it-(":")})?.value:it}.join('/')
+		println path
+		if (path.contains(':')){
+			def correctedList=[]
+			/**For each component delimited by a slash*/
+			path.split ('/').each{
+				def correctedElement=""
+				/**if it contains multipleplaceholders*/
+				if (it.contains('.') && it.contains(':')){
+					println it.split (/\./).collect{it.indexOf(':')!=-1?req.find({k,v->k==it-(":")})?.value:it}.join('.')
+					correctedElement= it.split (/\./).collect{it.indexOf(':')!=-1?req.find({k,v->k==it-(":")})?.value:it}.join('.')
+				}else if (it.contains(':')){
+					correctedElement=req.find({k,v->k==it-(":")})?.value
+				}else{
+				correctedElement=it
+				}
+				correctedList+=correctedElement
+			}
+			corrected=correctedList.join('/')
 		}
+
 		/**Removal of placeHolders in the finalPath*/
 		def usedToBuildFinalPath=path.split ('/').findAll{it.startsWith(":")}.collect{
 			it.replace(':','')
@@ -73,7 +93,7 @@ class MethodUtils {
 		if (param!="payload" &&!params.contains(param)){
 			throw new MethodCallError("Unregistered parameter")
 		}else{
-		return true
+			return true
 		}
 		//return param && param!="" && params.contains(param)
 	}

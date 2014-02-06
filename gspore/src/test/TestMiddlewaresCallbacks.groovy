@@ -14,10 +14,33 @@ import spore.Method;
 import spore.Spore
 import errors.MethodError
 import static spore.Method.middlewareBrowser
+import static utils.MethodUtils.placeHoldersReplacer
+
 
 class TestMiddlewaresCallbacks extends GroovyTestCase{
 	@Test
 	void testResponseRewrittingMiddleware(){
+		
+	}
+	@Test
+	void testTests(){
+		Method methoda = new Method([
+			name:"method2",
+			base_url:"http://my_test.org",
+			
+			path:"/test/:unelementdurl/:username.:format",
+			method:'GET',
+			required_params : [
+				"format",
+				"username",
+				"unelementdurl"
+			],
+			formats:" application/json",
+
+		])
+		println placeHoldersReplacer(['format':'json','username':'keven',"unelementdurl":"bla"],methoda.path,methoda).queryString
+		println placeHoldersReplacer(['format':'json','username':'keven',"unelementdurl":"bla"],methoda.path,methoda).finalPath
+		
 		
 	}
 	@Test
@@ -42,6 +65,8 @@ class TestMiddlewaresCallbacks extends GroovyTestCase{
 			formats:" application/json",
 
 		])
+		//println placeHoldersReplacer([:],methoda.base_url,methoda).queryString
+		//println placeHoldersReplacer([:],methoda.base_url,methoda).finalPath
 		def environ= methoda.baseEnviron()
 		spore.enable(
 				middleware.Middleware,

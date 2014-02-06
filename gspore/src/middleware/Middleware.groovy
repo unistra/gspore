@@ -5,6 +5,7 @@ class Middleware {
 	//Explicit constructor
 	def Middleware(args){
 		args.each{k,v->
+			println k
 			this.metaClass."$k"=v
 		}
 	}

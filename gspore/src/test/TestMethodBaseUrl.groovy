@@ -28,31 +28,28 @@ class TestMethodBaseUrl extends GroovyTestCase{
 				]
 			]
 		])
-		def args= ['name':'name','path':'path','method':'method']
 		def expected_response={
 			[
-				text:'OK',
+				text:'???',
 				status_code:200,
 				headers:['Content-Type': 'text-plain']
 			]
 		}
 		z.enable(
-			middleware.Mock,
+			middleware.Middleware,
 			[
 				fakes:[
 					'/method1':
 					expected_response()
 				],
 				processRequest:{env->
-					println "oui"+env
 					def arguments = [:]
-					this?."fakes"?.each{path,fakeResponse->
+					delegate?."fakes"?.each{path,fakeResponse->
 						if (path == ('/'+env['name'])){
-							args=fakeResponse
+							arguments=fakeResponse
 						}
 					}
-					println args
-					if (args.size()>0){
+					if (arguments.size()>0){
 					Response r = new Response(env)
 					return r
 					}else {
@@ -61,24 +58,96 @@ class TestMethodBaseUrl extends GroovyTestCase{
 				}
 			]
 			)
-		println z.middlewares
-		println z.description()
 		def resp =z.method1([:])
-		println resp
-		//def results = middlewareBrowser(z.middlewares,environ,storedCallbacks,"")
 		
-		assertTrue "ouais"=="ouais"
+		assertTrue resp['base_url']==z.base_url
 	}
 	@Test
 	void testWithLocalBaseUrlOnly(){
 		
+		Method method = new Method([
+			name:"aMethodName",
+			base_url:"http://my_test.org",
+			path:"/test",
+			method:'GET',
+			formats:" application/json",
+			
+		])
+		
+		assertTrue method.base_url=='http://my_test.org'
 	}
 	@Test
 	void testWithBothBaseUrl(){
+		Spore z = new Spore([
+			'name':'name',
+			'base_url':'http://my_test.org',
+			'methods':[
+				"method1" : [
+					"path" : "/target/method1",
+					"method":"get",
+					"formats":"application/json",
+					'base_url':'http://another_url.org',
+				]
+			]
+		])
+		def expected_response={
+			[
+				text:'???',
+				status_code:200,
+				headers:['Content-Type': 'text-plain']
+			]
+		}
+		z.enable(
+			middleware.Middleware,
+			[
+				fakes:[
+					'/method1':
+					expected_response()
+				],
+				processRequest:{env->
+					def arguments = [:]
+					delegate?."fakes"?.each{path,fakeResponse->
+						if (path == ('/'+env['name'])){
+							arguments=fakeResponse
+						}
+					}
+					if (arguments.size()>0){
+					Response r = new Response(env)
+					return r
+					}else {
+					return null
+					}
+				}
+			]
+			)
+		def resp =z.method1([:])
 		
+		assertTrue resp['base_url']=='http://another_url.org'
 	}
 	@Test
 	void testWithNoBaseUrl(){
+		def errorMessage =  ""
+		Spore z = new Spore([
+			'name':'name',
+			'base_url':'base_url',
+			'methods':[
+				"method1" : [
+					"path" : "/target/method1",
+					"method":"get"
+				]
+			]
+		])
 		
+		z.base_url=null
+		
+		try {
+		z.createMethod([name:"aMethodName",
+			path:"/test",
+			method:'GET',
+			formats:" application/json"])
+		}catch (MethodError me){
+		errorMessage = me.getMessage()
+		}
+		assertEquals errorMessage,"Either a base_url or an api_base_url should be specified"
 	}
 }
