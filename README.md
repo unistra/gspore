@@ -2,7 +2,7 @@ gspore
 ======
 
 >Gspore is intended on being used as a .jar which is 
->sufficient to allow java or groovy application that include it to consume >SPORE implementing webservices.  
+>sufficient to allow java or groovy application that include it to consume SPORE implementing webservices.  
 
 >It allows the consuming app to instanciate 
 >spore clients on the basis of api descriptions and to use them.
