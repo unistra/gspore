@@ -111,12 +111,8 @@ class TestMethodBaseUrl extends GroovyTestCase{
 							arguments=fakeResponse
 						}
 					}
-					if (arguments.size()>0){
 					Response r = new Response(env)
 					return r
-					}else {
-					return null
-					}
 				}
 			]
 			)

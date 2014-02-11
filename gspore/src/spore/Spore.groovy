@@ -178,11 +178,15 @@ class Spore {
 	/**Lighter syntax for Jizzlewares
 	 * @param middleware
 	 * @param args
+	 * @param String conditionName : the name of the condition
+	 * on which the middleware is to be enabled. Should be 
+	 * methodJizzed by the middleware instance.
+	 * 
 	 * @return
 	 */
-	def enableIf(middleware,args){
+	def enableIf(middleware,args,String conditionName){
 		def instance = middleware.newInstance(args)
-		def clos= instance.methodJizz("condition")
+		def clos= instance.methodJizz(conditionName)
 		middlewares[clos]= instance
 	}
 	//TODO

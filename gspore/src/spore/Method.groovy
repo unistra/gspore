@@ -30,7 +30,8 @@ import errors.MethodCallError
 class Method {
 	static contentTypes = ['JSON':JSON,'TEXT':TEXT,'XML':XML,"HTML":HTML,"URLENC":URLENC,"BINARY":BINARY]
 	static methods = ["GET":GET,"POST":POST,"PUT":PUT,"PATCH":PATCH]
-	HTTPBuilder builder = new HTTPBuilder();
+	//HTTPBuilder builder = new HTTPBuilder();
+	
 	@Mandatory
 	def name
 	@Mandatory
@@ -91,12 +92,10 @@ class Method {
 	 * environ, parameters and enabled middlewares
 	 */
 	def request={reqParams->
-
 		
 		Map environ = baseEnviron()
 		Map responseClosures=[:]
-		def ret = ""
-		def (requiredParamsMissing,whateverElseMissing,errors,storedCallbacks)=[[], [], [], []]
+		def (requiredParamsMissing,whateverElseMissing,errors)=[[], [], []]
 		def finalPath = placeHoldersReplacer(reqParams,path,this).finalPath
 		def queryString = placeHoldersReplacer(reqParams,path,this).queryString
 		environ['QUERY_STRING']=queryString
@@ -112,29 +111,26 @@ class Method {
 		 * and store callbacks intended on modifying
 		 * the response
 		 */
-		def afterLoopMap=  middlewareBrowser(delegate.middlewares,environ,storedCallbacks,ret)
-		ret = afterLoopMap.ret
-		environ = afterLoopMap.environ
-		println "OUAIS"+afterLoopMap.environ
-		
+		//def afterLoopMap=  middlewareBrowser(delegate.middlewares,environ,storedCallbacks,ret)
+		//ok man, ici tu vas essayer de faire du muliple assignement et on va voir comment ça se passe
+		def(noRequest,ret,middlewareModifiedenviron,storedCallbacks)=  middlewareBrowser(delegate.middlewares,environ)
+		//ret = afterLoopMap.ret
+		//environ = afterLoopMap.environ
 		/**Resolution of the stored callbacks,
 		 * which should be either reflect.Methods
 		 * either Closures,
 		 * in reverse order.
 		 * 
 		 */
-		afterLoopMap.storedCallbacks.reverseEach{
+		storedCallbacks.reverseEach{
 			if (it.class==java.lang.reflect.Method){
 				def declaringClass = it.getDeclaringClass()
 				Object obj = declaringClass.newInstance([:])
-				it.invoke(obj, environ)
+				it.invoke(obj, middlewareModifiedenviron)
 				responseClosures['success']=it
 			}else{
-				//it(environ)
-				//println it(environ)
 				responseClosures['success']=it
 			}
-			
 		}
 		
 		
@@ -144,7 +140,7 @@ class Method {
 		 *or exceeding parameters
 		 *errors can be raised.
 		 **/
-		if (afterLoopMap.noRequest==false){
+		if (noRequest==false){
 			required_params.each{
 				if (!reqParams.containsKey(it) &&  ! environ['spore.params'].containsKey(it)){
 					requiredParamsMissing+=it
@@ -164,13 +160,12 @@ class Method {
 		
 		/**Effective processing of the request
 		 * */
-		if (errors.size()==0 && afterLoopMap.noRequest==false){
+		if (errors.size()==0 && noRequest==false){
 			responseClosures.each{clef,valeur->
 				environ[clef]=valeur
 			}
 			ret = requestSend(environ)
 		}
-		
 		if (!requiredParamsMissing.empty){
 			ret=""
 			requiredParamsMissing.each{
@@ -202,6 +197,8 @@ class Method {
 	 * for this method, or would it be missing,
 	 *  the global_format which 
 	 * is inherited from the spore.
+	 * The contentTypeNormalizer should not be used, 
+	 * and futhermore it is more  or less broken
 	 */
 	def contentTypesNormalizer(args){
 		def normalized
@@ -210,8 +207,11 @@ class Method {
 		normalized=format.class==groovyx.net.http.ContentType?format:contentTypes[format.class==java.lang.String?format.toUpperCase():format[0].toUpperCase()]
 	}
 	
-	public static def middlewareBrowser(middlewares,environ,storedCallbacks,ret){
+	public static def middlewareBrowser(middlewares,environ){
 		boolean noRequest=false
+		def ret=""
+		def storedCallbacks=[]
+		
 		/**rather not idiomatic breakable loop that
 		 * calls middlewares. Breaks if a Response
 		 * is found. Can modify any of the keys and
@@ -248,6 +248,6 @@ class Method {
 			/**pass control to next middleware*/
 			return false
 		}
-		return ["noRequest":noRequest,"environ":environ,"storedCallbacks":storedCallbacks,"ret":ret]
+		return [noRequest,ret,environ,storedCallbacks]
 	}
 }
