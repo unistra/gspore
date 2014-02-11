@@ -76,7 +76,7 @@ class MethodUtils {
 				finalQuery[k]=v
 			}
 		}
-		return [queryString:finalQuery,finalPath:corrected!=""?corrected:path]
+		return [finalQuery,(corrected!=""?corrected:path)]
 	}
 	/**For each effective request parameter, checks if it is registered under
 	 * optional or required params

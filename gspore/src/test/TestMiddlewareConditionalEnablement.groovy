@@ -48,8 +48,8 @@ class TestMiddlewareConditionalEnablement extends GroovyTestCase{
 			){args->
 			args['REQUEST_METHOD']=="GET"
 		}
-			def results = middlewareBrowser(spore.middlewares,environ,storedCallbacks,"")
-			assertTrue results.environ['spore.headers']==["Authorization":64536546]
+			def results = middlewareBrowser(spore.middlewares,environ)
+			assertTrue results[2]['spore.headers']==["Authorization":64536546]
 	}
 	@Test
 	void testEnableIfConditionAssertToFalse(){
@@ -75,8 +75,8 @@ class TestMiddlewareConditionalEnablement extends GroovyTestCase{
 			){args->
 			args['REQUEST_METHOD']=="GET"
 		}
-			def results = middlewareBrowser(spore.middlewares,environ,storedCallbacks,"")
-			assertTrue !results.environ['spore.headers']
+			def results = middlewareBrowser(spore.middlewares,environ)
+			assertTrue !results[2]['spore.headers']
 	}
 
 }

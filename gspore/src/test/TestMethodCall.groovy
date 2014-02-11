@@ -32,6 +32,6 @@ class TestMethodCall extends GroovyTestCase{
 	}
 	@Test
 	void testfinalUrlWithOnePlaceHolder(){
-		assertEquals "http://localhost:8080/base/test/unid",finalUrl(method.baseEnviron())+placeHoldersReplacer([id:"unid"],method.path,method).finalPath
+		assertEquals "http://localhost:8080/base/test/unid",finalUrl(method.baseEnviron())+placeHoldersReplacer([id:"unid"],method.path,method)[1]
 	}
 }

@@ -68,8 +68,8 @@ class TestMiddlewaresCallbacks extends GroovyTestCase{
 				]
 				)
 
-		def results = middlewareBrowser(spore.middlewares,environ,storedCallbacks,"")
-		storedCallbacks = results.storedCallbacks
+		def results = middlewareBrowser(spore.middlewares,environ)
+		storedCallbacks = results[3]
 		assertTrue storedCallbacks.size()==2
 		assertTrue storedCallbacks[0] in Closure
 		assertTrue storedCallbacks[1] in Closure

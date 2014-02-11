@@ -36,8 +36,8 @@ class TestMethodPlaceholderReplacer extends GroovyTestCase{
 
 		])
 		def results =placeHoldersReplacer(['format':'json','username':'keven',"unelementdurl":"bla","anoptionalparam":"optionalstuff"],methoda.path,methoda)
-		assertTrue results.queryString == ['anoptionalparam':'optionalstuff']
-		assertEquals "/test/bla/keven.json",results.finalPath
+		assertTrue results[0] == ['anoptionalparam':'optionalstuff']
+		assertEquals "/test/bla/keven.json",results[1]
 	}
 
 }

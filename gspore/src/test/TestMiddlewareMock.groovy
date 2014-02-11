@@ -66,9 +66,9 @@ class TestMiddlewareMock extends GroovyTestCase {
 					
 				]
 				)
-		def results = middlewareBrowser(spore.middlewares,environ,storedCallbacks,"")
+		def results = middlewareBrowser(spore.middlewares,environ)
 		
-		assertTrue results.ret == ['headers':['Content-Type':'text-plain'], 'status_code':200, 'text':'OK']
+		assertTrue results[1] == ['headers':['Content-Type':'text-plain'], 'status_code':200, 'text':'OK']
 	}
 	@Test
 	void testJiddlewareJMock(){
@@ -110,8 +110,8 @@ class TestMiddlewareMock extends GroovyTestCase {
 					]
 				]
 				)
-		def results = middlewareBrowser(spore.middlewares,environ,storedCallbacks,"")
+		def results = middlewareBrowser(spore.middlewares,environ)
 		
-		assertTrue results.ret == ['headers':['Content-Type':'text-plain'], 'status_code':200, 'text':'OK']
+		assertTrue results[1] == ['headers':['Content-Type':'text-plain'], 'status_code':200, 'text':'OK']
 	}
 }

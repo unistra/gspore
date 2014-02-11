@@ -88,6 +88,7 @@ class Method {
 			'name':name
 		]
 	}
+	
 	/**A closure that builds the actual request from 
 	 * environ, parameters and enabled middlewares
 	 */
@@ -96,31 +97,23 @@ class Method {
 		Map environ = baseEnviron()
 		Map responseClosures=[:]
 		def (requiredParamsMissing,whateverElseMissing,errors)=[[], [], []]
-		def finalPath = placeHoldersReplacer(reqParams,path,this).finalPath
-		def queryString = placeHoldersReplacer(reqParams,path,this).queryString
+		def (queryString,finalPath) = placeHoldersReplacer(reqParams,path,this)
 		environ['QUERY_STRING']=queryString
 		environ['base_url']=base_url
 		environ['method']=method
 		environ['finalPath']=finalPath
 		environ['spore.params']=buildParams(reqParams,this)
 		environ['spore.payload']=buildPayload(reqParams,this)
-		/**Loop that breaks if a Response
-		 * is found. Can modify any of the keys and
-		 * values of the request's base environment
-		 * or create new ones, via middleware logic
-		 * and store callbacks intended on modifying
-		 * the response
+		/**Loop through middlewares
+		 * modify environment, store callbacks,
+		 * set the response if a middleware breaks the workflow.
 		 */
-		//def afterLoopMap=  middlewareBrowser(delegate.middlewares,environ,storedCallbacks,ret)
-		//ok man, ici tu vas essayer de faire du muliple assignement et on va voir comment ça se passe
-		def(noRequest,ret,middlewareModifiedenviron,storedCallbacks)=  middlewareBrowser(delegate.middlewares,environ)
-		//ret = afterLoopMap.ret
-		//environ = afterLoopMap.environ
+		def(noRequest,ret,middlewareModifiedenviron,storedCallbacks) =  middlewareBrowser(delegate.middlewares,environ)
+		
 		/**Resolution of the stored callbacks,
 		 * which should be either reflect.Methods
 		 * either Closures,
 		 * in reverse order.
-		 * 
 		 */
 		storedCallbacks.reverseEach{
 			if (it.class==java.lang.reflect.Method){
@@ -132,7 +125,6 @@ class Method {
 				responseClosures['success']=it
 			}
 		}
-		
 		
 		/**From here environ is not 
 		 *modified anymore
