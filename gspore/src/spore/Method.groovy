@@ -1,6 +1,5 @@
 package spore
 
-import groovyx.net.http.HTTPBuilder
 import static groovyx.net.http.Method.GET
 import static groovyx.net.http.Method.HEAD
 import static groovyx.net.http.Method.POST
@@ -30,7 +29,6 @@ import errors.MethodCallError
 class Method {
 	static contentTypes = ['JSON':JSON,'TEXT':TEXT,'XML':XML,"HTML":HTML,"URLENC":URLENC,"BINARY":BINARY]
 	static methods = ["GET":GET,"POST":POST,"PUT":PUT,"PATCH":PATCH]
-	//HTTPBuilder builder = new HTTPBuilder();
 	
 	@Mandatory
 	def name
@@ -97,13 +95,13 @@ class Method {
 		Map environ = baseEnviron()
 		Map responseClosures=[:]
 		def (requiredParamsMissing,whateverElseMissing,errors)=[[], [], []]
-		def (queryString,finalPath) = placeHoldersReplacer(reqParams,path,this)
-		environ['QUERY_STRING']=queryString
-		environ['base_url']=base_url
-		environ['method']=method
-		environ['finalPath']=finalPath
-		environ['spore.params']=buildParams(reqParams,this)
-		environ['spore.payload']=buildPayload(reqParams,this)
+		
+		/**Modification of environment
+		 * where request parameters
+		 * require it
+		 */
+		environ+=beforeMiddlewareRewritingMap(reqParams)
+		
 		/**Loop through middlewares
 		 * modify environment, store callbacks,
 		 * set the response if a middleware breaks the workflow.
@@ -198,7 +196,10 @@ class Method {
 		//voilà ici, c'est naze tu dois t'en débarasser
 		normalized=format.class==groovyx.net.http.ContentType?format:contentTypes[format.class==java.lang.String?format.toUpperCase():format[0].toUpperCase()]
 	}
-	
+	public beforeMiddlewareRewritingMap(reqParams){
+		def (queryString,finalPath) = placeHoldersReplacer(reqParams,path,this)
+		return ['QUERY_STRING':queryString,'base_url':base_url,'method':method,'finalPath':finalPath,'spore.params':buildParams(reqParams,this),'spore.payload':buildPayload(reqParams,this)]
+	}
 	public static def middlewareBrowser(middlewares,environ){
 		boolean noRequest=false
 		def ret=""
