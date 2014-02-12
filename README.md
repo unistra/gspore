@@ -12,7 +12,7 @@ specification.
 >The raw features of the spore client and it's 
 >dynamically generated methods can be customized by the middlewares, 
 >which are specific workflow rewriters that are added on client scope,
->but can be enabled in a conditional fashion.
+>but can be enabled in a conditional fashion(e.g add authentication element on client scope).
 
 
 
@@ -40,8 +40,8 @@ localArgs["spore.headers"]=["k":"v"]},  payload:["entry":["subEntry":'value']]
 >*//same thing, with a boolean returning closure to specify wether or not
 the Middleware should be enabled*
 
->**spore.enableIf(spore.Middleware,[payload:["k":"v"]]){
-			 spore.name!=null
+>**spore.enableIf(spore.Middleware,[payload:["entry":["subEntry":'value']]){args->
+			args['name']=="retrieve_page"
 			 }**
 
 >*//call method*
