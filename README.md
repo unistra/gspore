@@ -14,6 +14,25 @@ specification.
 >which are specific workflow rewriters that are added on client scope,
 >but can be enabled in a conditional fashion(e.g add authentication element on client scope).
 
+>The standard use of gspore should be something like
+
+1. Generate a client through api descritpion
+2. Create and enable, conditionaly or not, Middlewares
+3. Make requests
+
+>To summarize, the workflow processes through the following steps:
+
+1. feed() function is given the api description, and returns either
+errors or a Spore.
+2. In the second case, the Spore either returns errors or it adds itself one class method for each method registered in the api description Json under the entry "methods".
+3. By that point, basic HTTP request can be issued, and Middlewares can be enabled.
+4. If Middlewares were enabled, the method calls are intercepted and passed through each middleware, in enablement order, being potentially rewritten in the process.
+5. Unless the request was canceled, response structuring elements of the request go through each optional middleware post-processing callback in reverse enablement order.
+6. If no middleware prevented it from doing so, the request is actually sent.
+7. A response is returned to the client.
+
+
+
 
 
 
