@@ -70,6 +70,7 @@ class Method {
 		return [
 			'REQUEST_METHOD': method,
 			'SERVER_NAME': urlParse(base_url).hostName,
+			//TODO ne laisse pas ça mec c'est test purpose
 			'SERVER_PORT': urlParse(base_url).serverPort!=-1?urlParse(base_url).serverPort:base_url.startsWith('https')?443:base_url.startsWith('http')?80:'',
 			'SCRIPT_NAME': urlParse(base_url).path,
 			'PATH_INFO': path,
@@ -131,30 +132,21 @@ class Method {
 		 *errors can be raised.
 		 **/
 		if (noRequest==false){
-			required_params.each{
-				if (!reqParams.containsKey(it) &&  ! environ['spore.params'].containsKey(it)){
-					requiredParamsMissing+=it
-				}
-			}
-			[
-				requiredParamsMissing,
-				whateverElseMissing
-			].each() {
+			requiredParamsMissing = required_params.findAll{!reqParams.containsKey(it) &&  ! environ['spore.params'].containsKey(it)}
+			[requiredParamsMissing,whateverElseMissing].each() {
 				!it.empty?errors+=it:''
 			}
 			if(errors.size()>0){
 				throw new MethodCallError("required param missing : $errors")
 			}
-		}
-		
-		
-		/**Effective processing of the request
-		 * */
-		if (errors.size()==0 && noRequest==false){
-			responseClosures.each{clef,valeur->
-				environ[clef]=valeur
+			/**Effective processing of the request
+			 * */
+			if (errors.size()==0){
+				responseClosures.each{clef,valeur->
+					environ[clef]=valeur
+				}
+				ret = requestSend(environ)
 			}
-			ret = requestSend(environ)
 		}
 		if (!requiredParamsMissing.empty){
 			ret=""
@@ -165,6 +157,10 @@ class Method {
 		}
 		return ret
 	}
+	
+	
+	
+	
 	/**The no-parameter version of 
 	 *contentTypesNormalizer is used
 	 *only when generating the
@@ -177,6 +173,7 @@ class Method {
 		def format=formats?:global_formats
 		normalized=contentTypes[format?.class==java.lang.String?format.toUpperCase():format[0].toUpperCase()]?:format
 	}
+	
 	/**
 	 * @return in this order
 	 * the content-type specified
@@ -196,10 +193,12 @@ class Method {
 		//voilà ici, c'est naze tu dois t'en débarasser
 		normalized=format.class==groovyx.net.http.ContentType?format:contentTypes[format.class==java.lang.String?format.toUpperCase():format[0].toUpperCase()]
 	}
+	
 	public beforeMiddlewareRewritingMap(reqParams){
 		def (queryString,finalPath) = placeHoldersReplacer(reqParams,path,this)
 		return ['QUERY_STRING':queryString,'base_url':base_url,'method':method,'finalPath':finalPath,'spore.params':buildParams(reqParams,this),'spore.payload':buildPayload(reqParams,this)]
 	}
+	
 	public static def middlewareBrowser(middlewares,environ){
 		boolean noRequest=false
 		def ret=""

@@ -4,10 +4,12 @@ class Middleware {
 
 	//Explicit constructor
 	def Middleware(args){
+		println "YO"+args
 		args.each{k,v->
-			println k
 			this.metaClass."$k"=v
 		}
+		println this.metaClass
+		println this.getProperties()
 	}
 
 	def Middleware(){

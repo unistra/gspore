@@ -51,7 +51,6 @@ class Spore {
 		 * */
 		args?."methods".each(){methodName,value->
 			try{
-				//println "ouais"+![null, ""].contains(value['base_url'])?value['base_url']:base_url
 				methods+=methodName
 				def m = createMethod([
 					name:methodName,
@@ -95,7 +94,7 @@ class Spore {
 		if (checkResult==true){
 			return new Method(parsedJson)
 		}else{
-		String message=checkResult.values().join(';')
+			String message=checkResult.values().join(';')
 		
 			
 			throw new MethodError(message,new Throwable(message))
@@ -215,7 +214,6 @@ class Spore {
 		mandatoryFields.each(){
 			if (!args."$it") specErrors[it]="missing required field : $it"
 		}
-
 		if (specErrors.size()>0){
 			def errormessage=""
 			specErrors.each{

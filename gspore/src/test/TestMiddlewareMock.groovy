@@ -110,6 +110,7 @@ class TestMiddlewareMock extends GroovyTestCase {
 					]
 				]
 				)
+		//
 		def results = middlewareBrowser(spore.middlewares,environ)
 		
 		assertTrue results[1] == ['headers':['Content-Type':'text-plain'], 'status_code':200, 'text':'OK']

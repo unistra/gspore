@@ -28,7 +28,7 @@ class TestMethodCall extends GroovyTestCase{
 	])
 	@Test
 	void testRequestSender(){
-		println method.request([id:"unid"])
+		//println method.request([id:"unid"])
 	}
 	@Test
 	void testfinalUrlWithOnePlaceHolder(){

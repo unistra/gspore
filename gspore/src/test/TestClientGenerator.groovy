@@ -95,4 +95,5 @@ class TestClientGenerator extends GroovyTestCase{
 			assertTrue spore.metaClass.methods*.name.contains(k)
 		}
 	}
+	
 }

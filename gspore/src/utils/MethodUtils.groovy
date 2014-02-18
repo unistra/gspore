@@ -24,6 +24,8 @@ class MethodUtils {
 	 * @return the payload
 	 */
 	public static buildPayload(p,method){
+		println p 
+		println method
 		def entry = p["payload"]?:null
 		if (method.required_payload && !entry) throw new MethodCallError('Payload is required for this function')
 		p.remove("payload")
