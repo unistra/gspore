@@ -19,13 +19,12 @@ class MethodUtils {
 			"scheme":aURI.getScheme()
 		]
 	}
+	//here, is it necessary to remove ["payload"]from parameters??????????????
 	/**pop ["payload"]from parameters and add payload to environ
 	 * @param p : the request effective parameters
 	 * @return the payload
 	 */
 	public static buildPayload(p,method){
-		println p 
-		println method
 		def entry = p["payload"]?:null
 		if (method.required_payload && !entry) throw new MethodCallError('Payload is required for this function')
 		p.remove("payload")
@@ -46,7 +45,6 @@ class MethodUtils {
 		Map finalQuery=[:]
 
 		/**If the path contains placeHolders marks*/
-		println path
 		def correctedList=[]
 		def keys=[]
 		def gotReplaced=[]

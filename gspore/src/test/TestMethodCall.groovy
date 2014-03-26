@@ -13,7 +13,7 @@ import groovy.json.JsonException
 import spore.Method;
 import spore.Spore
 import errors.MethodError
-import static request.Request.finalUrl
+import static utils.RequestUtils.finalUrl
 import static utils.MethodUtils.placeHoldersReplacer
 
 class TestMethodCall extends GroovyTestCase{

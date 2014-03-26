@@ -44,8 +44,6 @@ class TestMiddlewaresCallbacks extends GroovyTestCase{
 			formats:" application/json",
 
 		])
-		//println placeHoldersReplacer([:],methoda.base_url,methoda).queryString
-		//println placeHoldersReplacer([:],methoda.base_url,methoda).finalPath
 		def environ= methoda.baseEnviron()
 		spore.enable(
 				middleware.Middleware,

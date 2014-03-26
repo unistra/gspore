@@ -10,9 +10,10 @@ import groovy.json.JsonException
 import spore.Spore
 
 class TestSporeMiddlewares  extends GroovyTestCase{
-
+	
 	@Test
 	void testSporeMiddlewares(){
+		
 		Spore z = new Spore([
 			'name':'name',
 			'base_url':'base_url',
@@ -46,7 +47,6 @@ class TestSporeMiddlewares  extends GroovyTestCase{
 				}
 			]
 			)
-		//println 
 		assertEquals 2,z.middlewares.size()
 		
 	}

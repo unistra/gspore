@@ -4,14 +4,10 @@ class Middleware {
 
 	//Explicit constructor
 	def Middleware(args){
-		println "YO"+args
 		args.each{k,v->
 			this.metaClass."$k"=v
 		}
-		println this.metaClass
-		println this.getProperties()
 	}
-
 	def Middleware(){
 	}
 	def call={params->

@@ -52,7 +52,6 @@ class Method {
 	def global_formats
 	def defaults
 
-	//Explicit  constructor
 	Method(args){
 		args?.each(){k,v->
 			if (this.properties.find({ it.key==k})){
@@ -92,7 +91,6 @@ class Method {
 	 * environ, parameters and enabled middlewares
 	 */
 	def request={reqParams->
-		
 		Map environ = baseEnviron()
 		Map responseClosures=[:]
 		def (requiredParamsMissing,whateverElseMissing,errors)=[[], [], []]
@@ -170,34 +168,17 @@ class Method {
 	 */
 	def contentTypesNormalizer(){
 		def normalized
-		def format=formats?:global_formats
-		normalized=contentTypes[format?.class==java.lang.String?format.toUpperCase():format[0].toUpperCase()]?:format
+		def format=formats?:global_formats?:"application/json"
+		//normalized=contentTypes[format?.class==java.lang.String?format.toUpperCase():format[0].toUpperCase()]?:format
 	}
 	
-	/**
-	 * @return in this order
-	 * the content-type specified
-	 * in the environ (so that if it has
-	 * been modified by whatever middleware,
-	 * it is taken in account), 
-	 * the specific content type
-	 * for this method, or would it be missing,
-	 *  the global_format which 
-	 * is inherited from the spore.
-	 * The contentTypeNormalizer should not be used, 
-	 * and futhermore it is more  or less broken
-	 */
-	def contentTypesNormalizer(args){
-		def normalized
-		def format=args['spore.format']?:formats?:global_formats
-		//voilà ici, c'est naze tu dois t'en débarasser
-		normalized=format.class==groovyx.net.http.ContentType?format:contentTypes[format.class==java.lang.String?format.toUpperCase():format[0].toUpperCase()]
-	}
 	
 	public beforeMiddlewareRewritingMap(reqParams){
 		def (queryString,finalPath) = placeHoldersReplacer(reqParams,path,this)
 		return ['QUERY_STRING':queryString,'base_url':base_url,'method':method,'finalPath':finalPath,'spore.params':buildParams(reqParams,this),'spore.payload':buildPayload(reqParams,this)]
 	}
+	
+	
 	
 	public static def middlewareBrowser(middlewares,environ){
 		boolean noRequest=false
