@@ -143,7 +143,12 @@ class Method {
 				responseClosures.each{clef,valeur->
 					environ[clef]=valeur
 				}
+				def t = 3345
+				try{
 				ret = requestSend(environ)
+				}catch(Exception e){
+				ret = e
+				}
 			}
 		}
 		if (!requiredParamsMissing.empty){
