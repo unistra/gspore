@@ -23,20 +23,23 @@ class Request {
 	static methods = ["GET":GET,"POST":POST,"PUT":PUT,"PATCH":PATCH,"HEAD":HEAD,"DELETE":DELETE]
 	static HTTPBuilder builder = new HTTPBuilder();
 
-	public static String requestSend(args){
+	public static def requestSend(args){
 
-		def ret=""
+		def ret
+		/*The response behavior
+		 *when the request is successful
+		 */
 		def defaultBehavior={resp,json->
 			String statusCode=String?.valueOf(resp.statusLine.statusCode)
 			if (args['success'] ){
 				ret = args['success'](resp,json)
 			}else{
-				ret += json
-				ret+=" : "
-				ret+=statusCode
+				ret = json
 			}
 		}
-
+		/*The response behavior
+		 *when the request fails
+		 */
 		def defaultFailureBehavior={resp,json->
 			String statusCode=String?.valueOf(resp.statusLine.statusCode)
 			ret+="request failure"+" : "+statusCode
@@ -44,13 +47,18 @@ class Request {
 
 		builder.handler.success=defaultBehavior
 		builder.handler.failure=defaultFailureBehavior
+		
+		/*The builder's request method is 
+		 *the spot where the request is actually sent.
+		 *Its handlers are the response formatters.
+		 */
 		builder.request(finalUrl(args),methods[args['method']],contentTypesNormalizer(args)) {
 			uri.path = finalPath(args)
 			uri.query = args['queryString']
 			args["spore.headers"].each{k,v->
 				headers."$k"="$v"
 			}
-			headers.'User-Agent' = ' Mozilla/5.0 '
+			headers.'User-Agent' = 'GSPORE'
 			headers.'Accept'=contentTypesNormalizer(args)
 			if (["POST", "PUT", "PATCH"].contains(request.method)){
 				send contentTypesNormalizer(args),args['spore.payload']
