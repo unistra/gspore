@@ -42,7 +42,7 @@ class Request {
 		 */
 		def defaultFailureBehavior={resp,json->
 			String statusCode=String?.valueOf(resp.statusLine.statusCode)
-			ret+="request failure"+" : "+statusCode
+			ret=json
 		}
 
 		builder.handler.success=defaultBehavior
