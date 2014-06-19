@@ -12,7 +12,8 @@ class Holder {
 	
 	public static def getClient(name,url){
 		Spore spore
-		if (Spores.keySet().contains(name)){
+		
+		if (Spores.containsKey(name)){
 			spore = Spores[name]
 		}else{
 			spore = feed(url)
