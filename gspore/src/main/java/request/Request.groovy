@@ -54,7 +54,7 @@ class Request {
 		 */
 		builder.request(finalUrl(args),methods[args['method']],contentTypesNormalizer(args)) {
 			uri.path = finalPath(args)
-			uri.query = args['queryString']
+			uri.query = args['QUERY_STRING']
 			args["spore.headers"].each{k,v->
 				headers."$k"="$v"
 			}
