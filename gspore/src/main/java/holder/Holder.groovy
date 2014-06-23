@@ -10,7 +10,7 @@ class Holder {
 		
 	}
 	
-	public static def getClient(name,url){
+	public static Spore getClient(name,url){
 		Spore spore
 		
 		if (Spores.containsKey(name)){
