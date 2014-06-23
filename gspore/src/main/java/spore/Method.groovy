@@ -51,7 +51,15 @@ class Method {
 	def global_authentication
 	def global_formats
 	def defaults
-
+	
+	/**Explicit constructor 
+	 * For each argument whose key 
+	 * matches one of the Class 
+	 * properties name, 
+	 * set the value of
+	 * the matching property 
+	 * to its value
+	 */
 	Method(args){
 		args?.each(){k,v->
 			if (this.properties.find({ it.key==k})){
@@ -113,12 +121,20 @@ class Method {
 		 * in reverse order.
 		 */
 		storedCallbacks.reverseEach{
+			/**The stored callback is 
+			 * a java.lang.reflect.Method
+			 */
 			if (it.class==java.lang.reflect.Method){
 				def declaringClass = it.getDeclaringClass()
 				Object obj = declaringClass.newInstance([:])
 				it.invoke(obj, middlewareModifiedenviron)
 				responseClosures['success']=it
-			}else{
+			}
+			/**The stored callback
+			 * is a Closure
+			 */
+			else{
+			
 				responseClosures['success']=it
 			}
 		}
@@ -143,7 +159,12 @@ class Method {
 				responseClosures.each{clef,valeur->
 					environ[clef]=valeur
 				}
+				def t = 3345
+				try{
 				ret = requestSend(environ)
+				}catch(Exception e){
+				ret = e
+				}
 			}
 		}
 		if (!requiredParamsMissing.empty){
@@ -155,9 +176,6 @@ class Method {
 		}
 		return ret
 	}
-	
-	
-	
 	
 	/**The no-parameter version of 
 	 *contentTypesNormalizer is used

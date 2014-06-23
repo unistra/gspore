@@ -41,13 +41,9 @@ SPORE CLIENT
 
 ###sample groovy syntax :
 
->*//Instanciate Json reader*
+>*//Create or get client*
 
->**SporeFeeder feed =new SporeFeeder()**
-
->*//Create Spore*
-
->**Spore spore = feed.feed("/pathToMyJson/test.json")**
+>**Spore spore = getClient("Client","/pathToMyJson/test.json")**
 
 >*//Enable Middleware, from hard-coded class or by generating a modified at runtime Middleware*
 
@@ -69,19 +65,17 @@ the Middleware should be enabled*
 
 ###sample java syntax : 
 
->*//Instanciate Json feeder*
+>*//Create or get client*
 
->**SporeFeeder feed = new SporeFeeder();**
-		
->**Spore spore = feed.feed("/pathToMyJson/test.json");**
+>**Spore spore = getClient("Client","/pathToMyJson/test.json");**
 		
 >*//Instanciate Middleware from hard-coded class*
 
->**Jazzleware j = new Jazzleware();**
+>**JContentTypeSetter j = new JContentTypeSetter();**
 
->*//enable Middleware conditionnaly*
+>*//enable Middleware conditionnaly or not*
 
->**spore.enableIf(j.getClass(), args);**
+>**spore.enable(j.getClass(), args);**
 
 >**Map<Object,Object> args0 = new HashMap<Object ,Object>();**
 

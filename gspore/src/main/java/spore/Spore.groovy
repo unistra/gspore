@@ -158,6 +158,7 @@ class Spore {
 	def enableIf(middleware,args,Closure clos){
 		def instance = middleware.newInstance(args)
 		middlewares[clos]= instance
+		
 	}
 	/**The method used to 
 	 * enable CONDITIONNALY a Middleware to modifiy

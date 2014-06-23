@@ -11,12 +11,10 @@ class Middleware {
 	def Middleware(){
 	}
 	def call={params->
-		List l =this?.metaClass?.methods*.name
-
-		def methodName = this?.metaClass?.methods?.find{['processRequest','processResponse'].contains(it.name)}.name
-		
-		def ret=this?."$methodName"(params)
-		
-		return ret
+		this?.metaClass?.methods?.find{
+			['processRequest','processResponse'].contains(it.name)
+			}.invoke(this,params)
 	}
 }
+//def methodName = this?.metaClass?.methods?.find{['processRequest','processResponse'].contains(it.name)}.name
+//this?."$methodName"(params)
