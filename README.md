@@ -71,11 +71,11 @@ the Middleware should be enabled*
 		
 >*//Instanciate Middleware from hard-coded class*
 
->**JContentTypeSetter jc = new JContentTypeSetter();**
+>**JContentTypeSetter j = new JContentTypeSetter();**
 
->*//enable Middleware conditionnaly*
+>*//enable Middleware conditionnaly or not*
 
->**spore.enableIf(j.getClass(), args);**
+>**spore.enable(j.getClass(), args);**
 
 >**Map<Object,Object> args0 = new HashMap<Object ,Object>();**
 
