@@ -59,7 +59,7 @@ class Request {
 				headers."$k"="$v"
 			}
 			headers.'User-Agent' = 'GSPORE'
-			headers.'Accept'=contentTypesNormalizer(args)
+			headers.'Accept' = contentTypesNormalizer(args)
 			if (["POST", "PUT", "PATCH"].contains(request.method)){
 				send contentTypesNormalizer(args),args['spore.payload']
 			}

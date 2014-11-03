@@ -8,8 +8,9 @@ class Middleware {
 			this.metaClass."$k"=v
 		}
 	}
-	def Middleware(){
-	}
+
+	def Middleware(){}
+
 	def call={params->
 		this?.metaClass?.methods?.find{
 			['processRequest','processResponse'].contains(it.name)

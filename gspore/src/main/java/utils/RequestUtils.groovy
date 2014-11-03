@@ -19,8 +19,13 @@ class RequestUtils {
 	 * remove it, please.
 	 */
 	public static contentTypesNormalizer(args){
+		//bon ici faut que tu
+		//interceptes les occurrences de "json"
+		//et que tu foutes application/json
+		//c'est dans la spec donc do it.
 		def normalized
 		def format=args['spore.format']?:args['formats']?:args['global_formats']?:"application/json"
+		return format=="json"?"application/json":format
 	}
 	public static finalPath(args){
 		// ici c'est vraiment bizarre
