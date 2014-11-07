@@ -19,7 +19,7 @@ import static utils.RequestUtils.finalPath
 import static utils.RequestUtils.finalUrl
 import static utils.RequestUtils.domainNameAndServerPort
 class Request {
-	static contentTypes = ['JSON':JSON,'TEXT':TEXT,'XML':XML,"HTML":HTML,"URLENC":URLENC,"BINARY":BINARY]
+	static contentTypes = ['JSON':JSON,'TEXT':TEXT,'XML':XML,"HTML":HTML,"URLENC":URLENC,"BINARY":BINARY,"ANY":ANY]
 	static methods = ["GET":GET,"POST":POST,"PUT":PUT,"PATCH":PATCH,"HEAD":HEAD,"DELETE":DELETE]
 	static HTTPBuilder builder = new HTTPBuilder();
 
@@ -34,17 +34,25 @@ class Request {
 			if (args['success'] ){
 				ret = args['success'](resp,json)
 			}else{
-				ret = json
+				if (json.class in org.apache.http.conn.EofSensorInputStream){
+					java.util.Scanner s = new java.util.Scanner(json).useDelimiter("\\A");
+					ret=['response':resp,"data":s.hasNext() ? s.next() : ""];
+				}else{
+				ret=['response':resp,"data":json]
+				}
 			}
 		}
 		/*The response behavior
 		 *when the request fails
 		 */
 		def defaultFailureBehavior={resp,json->
-			String statusCode=String?.valueOf(resp.statusLine.statusCode)
-			ret=json
+				if (json.class in org.apache.http.conn.EofSensorInputStream){
+					java.util.Scanner s = new java.util.Scanner(json).useDelimiter("\\A");
+					ret=['response':resp,"data":s.hasNext() ? s.next() : ""];
+				}else{
+				ret=['response':resp,"data":json]
+				}
 		}
-
 		builder.handler.success=defaultBehavior
 		builder.handler.failure=defaultFailureBehavior
 		
@@ -52,22 +60,22 @@ class Request {
 		 *the spot where the request is actually sent.
 		 *Its handlers are the response formatters.
 		 */
-		builder.request(finalUrl(args),methods[args['method']],contentTypesNormalizer(args)) {
-			uri.path = finalPath(args)
+		// DEBUG Arnaud et Thierry
+		def ct = args['spore.headers'].keySet().contains('Content-Type') ? args['spore.headers']['Content-Type'] : args["spore.format"]
+//		args.containsKey("spore.format") && args["spore.format"]!=""?ct=args["spore.format"]:""
+		builder.request(finalUrl(args),methods[args['method']], ct) {
+			uri.path += finalPath(args)
 			uri.query = args['QUERY_STRING']
 			args["spore.headers"].each{k,v->
 				headers."$k"="$v"
 			}
-			headers.'User-Agent' = 'GSPORE'
-			headers.'Accept' = contentTypesNormalizer(args)
+			headers.'User-Agent' = "GSPORE"
+			headers.'Accept' = contentTypes.ANY
 			if (["POST", "PUT", "PATCH"].contains(request.method)){
-				send contentTypesNormalizer(args),args['spore.payload']
+//				send contentTypesNormalizer(args),args['spore.payload']
+				send ct, args['spore.payload']
 			}
 		}
 		return ret
 	}
-
-
-
-	
 }

@@ -93,7 +93,7 @@ class MethodUtils {
 				params+=it
 			}
 		}
-		if (param!="payload" &&!params.contains(param)){
+		if (param!="payload" && !params.contains(param)){
 			throw new MethodCallError("Unregistered parameter")
 		}else{
 			return true

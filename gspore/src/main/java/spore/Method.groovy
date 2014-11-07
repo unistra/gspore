@@ -77,7 +77,6 @@ class Method {
 		return [
 			'REQUEST_METHOD': method,
 			'SERVER_NAME': urlParse(base_url).hostName,
-			//TODO ne laisse pas ça mec c'est test purpose
 			'SERVER_PORT': urlParse(base_url).serverPort!=-1?urlParse(base_url).serverPort:base_url.startsWith('https')?443:base_url.startsWith('http')?80:'',
 			'SCRIPT_NAME': urlParse(base_url).path,
 			'PATH_INFO': path,
@@ -114,7 +113,6 @@ class Method {
 		 * set the response if a middleware breaks the workflow.
 		 */
 		def(noRequest,ret,middlewareModifiedenviron,storedCallbacks) =  middlewareBrowser(delegate.middlewares,environ)
-		
 		/**Resolution of the stored callbacks,
 		 * which should be either reflect.Methods
 		 * either Closures,
@@ -193,7 +191,12 @@ class Method {
 	
 	public beforeMiddlewareRewritingMap(reqParams){
 		def (queryString,finalPath) = placeHoldersReplacer(reqParams,path,this)
-		return ['QUERY_STRING':queryString,'base_url':base_url,'method':method,'finalPath':finalPath,'spore.params':buildParams(reqParams,this),'spore.payload':buildPayload(reqParams,this)]
+		return ['QUERY_STRING':queryString,
+			    'base_url':base_url,
+				'method':method,
+				'finalPath':finalPath,
+				'spore.params':buildParams(reqParams,this),
+				'spore.payload':buildPayload(reqParams,this)]
 	}
 	
 	
