@@ -18,13 +18,15 @@ import static utils.RequestUtils.contentTypesNormalizer
 import static utils.RequestUtils.finalPath
 import static utils.RequestUtils.finalUrl
 import static utils.RequestUtils.domainNameAndServerPort
+
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+
 class Request {
 	static contentTypes = ['JSON':JSON,'TEXT':TEXT,'XML':XML,"HTML":HTML,"URLENC":URLENC,"BINARY":BINARY,"ANY":ANY]
 	static methods = ["GET":GET,"POST":POST,"PUT":PUT,"PATCH":PATCH,"HEAD":HEAD,"DELETE":DELETE]
 	static HTTPBuilder builder = new HTTPBuilder();
 
 	public static def requestSend(args){
-
 		def ret
 		/*The response behavior
 		 *when the request is successful

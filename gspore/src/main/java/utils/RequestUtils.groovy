@@ -28,7 +28,6 @@ class RequestUtils {
 	}
 
 	public static finalUrl(args){
-		//args['wsgi.url_scheme']+"://"+domainNameAndServerPort(args['SERVER_NAME'],args['SERVER_PORT'])+args['SCRIPT_NAME']
 		args['wsgi.url_scheme']+"://"+domainNameAndServerPort(args['SERVER_NAME'],args['SERVER_PORT'])+(args['SCRIPT_NAME'][args['SCRIPT_NAME'].length() - 1]!="/"?args['SCRIPT_NAME']:args['SCRIPT_NAME'].subSequence(0, args['SCRIPT_NAME'].length() - 1))
 	}
 

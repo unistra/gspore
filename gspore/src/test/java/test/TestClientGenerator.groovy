@@ -8,6 +8,7 @@ import java.io.FileNotFoundException
 import groovy.json.JsonSlurper
 import groovy.json.JsonException
 import spore.Spore
+import static holder.Holder.getClient
 
 class TestClientGenerator extends GroovyTestCase{
 	Spore spore
@@ -63,9 +64,23 @@ class TestClientGenerator extends GroovyTestCase{
 		spore = feed(j.path)
 		j.delete()
 		assertEquals(content['base_url'],spore.base_url)
+	
+	
 		
 		
-		
+	}
+	@Test
+	void testGetClient(){
+		def correctJson = this.getClass().getResource("right.json")
+		InputStream urlStream = correctJson.openStream();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(urlStream));
+		File j = new File("newright.json")
+		j.append(reader.getText())
+		String jsonString = j.text
+		def content=slurper.parseText(j.text)
+		spore = getClient('toto',j.path)
+		j.delete()
+		assertEquals(content['base_url'],spore.base_url)
 	}
 	@Test
 	void testWithBaseUrl(){
