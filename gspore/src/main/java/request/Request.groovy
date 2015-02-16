@@ -27,6 +27,7 @@ class Request {
 	static HTTPBuilder builder = new HTTPBuilder();
 	
 	public static def requestSend(args){
+		def requiresScan={j->j.class in org.apache.http.conn.EofSensorInputStream }
 		def data = {s->s.hasNext() ? s.next() : ""}
 		def ret
 		/*The response behavior
@@ -37,8 +38,8 @@ class Request {
 			if (args['success'] ){
 				ret = args['success'](resp,json)
 			}else{
-				if (json.class in org.apache.http.conn.EofSensorInputStream){
-					java.util.Scanner s = new java.util.Scanner(json).useDelimiter("\\A");
+				if (requiresScan(json)){
+					def s = new java.util.Scanner(json).useDelimiter("\\A");
 					ret=['response':resp,"data":data(s)];
 				}else{
 				ret=['response':resp,"data":json]
@@ -49,8 +50,8 @@ class Request {
 		 *when the request fails
 		 */
 		def failure={resp,json->
-				if (json.class in org.apache.http.conn.EofSensorInputStream){
-					java.util.Scanner s = new java.util.Scanner(json).useDelimiter("\\A");
+				if (requiresScan(json)){
+					def s = new java.util.Scanner(json).useDelimiter("\\A");
 					ret=['response':resp,"data":data(s)];
 				}else{
 				ret=['response':resp,"data":json]
