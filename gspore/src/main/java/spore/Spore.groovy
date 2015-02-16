@@ -211,7 +211,7 @@ class Spore {
 			this.getClass().declaredFields.find {
 				it.name == prop.key && Mandatory in it.declaredAnnotations*.annotationType()
 			}
-		}.keySet()
+		}?.keySet()
 		mandatoryFields.each(){
 			if (!args."$it") specErrors[it]="missing required field : $it"
 		}

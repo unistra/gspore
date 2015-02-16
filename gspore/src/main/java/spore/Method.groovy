@@ -78,7 +78,7 @@ class Method {
 			'REQUEST_METHOD': method,
 			'SERVER_NAME': urlParse(base_url).hostName,
 			'SERVER_PORT': urlParse(base_url).serverPort!=-1?urlParse(base_url).serverPort:base_url.startsWith('https')?443:base_url.startsWith('http')?80:'',
-			'SCRIPT_NAME': urlParse(base_url).path,
+			'SCRIPT_NAME': urlParse(base_url).path?:"/",
 			'PATH_INFO': path,
 			'QUERY_STRING': "",
 			'HTTP_USER_AGENT': 'whatever',
@@ -132,7 +132,6 @@ class Method {
 			 * is a Closure
 			 */
 			else{
-			
 				responseClosures['success']=it
 			}
 		}
@@ -157,7 +156,6 @@ class Method {
 				responseClosures.each{clef,valeur->
 					environ[clef]=valeur
 				}
-				def t = 3345
 				try{
 				ret = requestSend(environ)
 				}catch(Exception e){
@@ -189,7 +187,7 @@ class Method {
 	}
 	
 	
-	public beforeMiddlewareRewritingMap(reqParams){
+	public  beforeMiddlewareRewritingMap(reqParams){
 		def (queryString,finalPath) = placeHoldersReplacer(reqParams,path,this)
 		return ['QUERY_STRING':queryString,
 			    'base_url':base_url,

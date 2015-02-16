@@ -25,20 +25,21 @@ class Request {
 	static contentTypes = ['JSON':JSON,'TEXT':TEXT,'XML':XML,"HTML":HTML,"URLENC":URLENC,"BINARY":BINARY,"ANY":ANY]
 	static methods = ["GET":GET,"POST":POST,"PUT":PUT,"PATCH":PATCH,"HEAD":HEAD,"DELETE":DELETE]
 	static HTTPBuilder builder = new HTTPBuilder();
-
+	
 	public static def requestSend(args){
+		def data = {s->s.hasNext() ? s.next() : ""}
 		def ret
 		/*The response behavior
 		 *when the request is successful
 		 */
-		def defaultBehavior={resp,json->
+		def success={resp,json->
 			String statusCode=String?.valueOf(resp.statusLine.statusCode)
 			if (args['success'] ){
 				ret = args['success'](resp,json)
 			}else{
 				if (json.class in org.apache.http.conn.EofSensorInputStream){
 					java.util.Scanner s = new java.util.Scanner(json).useDelimiter("\\A");
-					ret=['response':resp,"data":s.hasNext() ? s.next() : ""];
+					ret=['response':resp,"data":data(s)];
 				}else{
 				ret=['response':resp,"data":json]
 				}
@@ -47,23 +48,22 @@ class Request {
 		/*The response behavior
 		 *when the request fails
 		 */
-		def defaultFailureBehavior={resp,json->
+		def failure={resp,json->
 				if (json.class in org.apache.http.conn.EofSensorInputStream){
 					java.util.Scanner s = new java.util.Scanner(json).useDelimiter("\\A");
-					ret=['response':resp,"data":s.hasNext() ? s.next() : ""];
+					ret=['response':resp,"data":data(s)];
 				}else{
 				ret=['response':resp,"data":json]
 				}
 		}
-		builder.handler.success=defaultBehavior
-		builder.handler.failure=defaultFailureBehavior
+		builder.handler.success=success
+		builder.handler.failure=failure
 		
 		/*The builder's request method is 
 		 *the spot where the request is actually sent.
 		 *Its handlers are the response formatters.
 		 */
-		// DEBUG Arnaud et Thierry
-		def ct = args['spore.headers'].keySet().contains('Content-Type') ? args['spore.headers']['Content-Type'] : args["spore.format"]
+		def ct = args['spore.headers']?.keySet().contains('Content-Type') ? args['spore.headers']['Content-Type'] : args["spore.format"]
 //		args.containsKey("spore.format") && args["spore.format"]!=""?ct=args["spore.format"]:""
 		builder.request(finalUrl(args),methods[args['method']], ct) {
 			uri.path += finalPath(args)

@@ -25,6 +25,7 @@ class ThisTestSuite extends TestSuite{
 		suite.addTestSuite(gsuite.compile(TEST_ROOT + "TestMethodPayload.groovy"));
 	
 		suite.addTestSuite(gsuite.compile(TEST_ROOT + "TestMiddlewaresCallbacks.groovy"));
+		suite.addTestSuite(gsuite.compile(TEST_ROOT + "TestRequest.groovy"));
 		return suite;
 	}
 
