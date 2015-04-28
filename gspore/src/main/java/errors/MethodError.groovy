@@ -1,7 +1,7 @@
 package errors
 
 class MethodError extends Exception{
-	MethodError( message){
+	MethodError(message){
 		super(message)
 	}
 	MethodError(Throwable cause){

@@ -16,6 +16,7 @@ import errors.MethodError
 import static spore.Method.middlewareBrowser
 import static utils.MethodUtils.placeHoldersReplacer
 import org.apache.wink.client.MockHttpServer;
+import static Utils.mockHttpServer
 
 
 class TestMiddlewaresCallbacks extends GroovyTestCase{
@@ -25,13 +26,7 @@ class TestMiddlewaresCallbacks extends GroovyTestCase{
 
 	@Test
 	void testMiddleware(){
-		MockHttpServer mockServer = new MockHttpServer(3333);
-		mockServer.startServer();
-		String url = "http://localhost:" + (mockServer.getServerPort()+1) + "/target/method1";
-		MockHttpServer.MockHttpServerResponse response = new MockHttpServer.MockHttpServerResponse();
-		response.setMockResponseContent('{"some":"response"}');
-		response.setMockResponseCode(200);
-		mockServer.setMockHttpServerResponses(response);
+		def mockServer = mockHttpServer()
 		Spore spore = new Spore([
 			'name':'name',
 			'base_url':'http://localhost:3334/',
@@ -70,13 +65,7 @@ class TestMiddlewaresCallbacks extends GroovyTestCase{
 	}
 	@Test
 	void testEncodingMiddleware(){
-		MockHttpServer mockServer = new MockHttpServer(3333);
-		mockServer.startServer();
-		String url = "http://localhost:" + (mockServer.getServerPort()+1) + "/target/method1";
-		MockHttpServer.MockHttpServerResponse response = new MockHttpServer.MockHttpServerResponse();
-		response.setMockResponseContent('{"some":"response"}');
-		response.setMockResponseCode(200);
-		mockServer.setMockHttpServerResponses(response);
+		def mockServer = mockHttpServer()
 		Spore spore = new Spore([
 			'name':'name',
 			'base_url':'http://localhost:3334/',
@@ -102,7 +91,8 @@ class TestMiddlewaresCallbacks extends GroovyTestCase{
 				[:
 				]
 				)
-		
+		println spore.methods
+		println spore.method1(["arg":"arg","barg":"barg"]).data
 		assertTrue middlewareBrowser(spore.middlewares,["spore.params":["arg":"arg","barg":"barg"]])[2]['spore.params']['sign']=="8b89c166113948bdcec3dcfbf45fa944da31cab6"
 		mockServer.stopServer()
 	}
