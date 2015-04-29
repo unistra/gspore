@@ -6,7 +6,7 @@ class ContentTypeSetter extends Middleware{
 		
 	}
 	def processRequest(environ){
-		environ ['spore.format']="application/json"
+		environ ['spore.format']=this?.contentType
 		return null
 	}
 }
