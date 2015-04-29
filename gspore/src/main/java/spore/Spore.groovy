@@ -129,8 +129,11 @@ class Spore {
 			}
 		}
 		if (!parsedJson['base_url'] && !parsedJson['api_base_url'] && !base_url){
-
 			methodBuildError['base_url']="Either a base_url or an api_base_url should be specified"
+
+		}
+		if (!parsedJson['method']){
+			methodBuildError['http_method']="Method is required in the description file"
 
 		}
 		return methodBuildError?.size()==0?true:methodBuildError
