@@ -1,5 +1,7 @@
 package test
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test
 
 import groovy.util.GroovyTestCase
@@ -15,7 +17,9 @@ import spore.Spore
 import errors.MethodError
 import static spore.Method.middlewareBrowser
 import static utils.MethodUtils.placeHoldersReplacer
+
 import org.apache.wink.client.MockHttpServer;
+
 import static Utils.mockHttpServer
 
 
@@ -23,13 +27,20 @@ class TestMiddlewaresCallbacks extends GroovyTestCase{
 	@Test
 	void testResponseRewrittingMiddleware(){
 	}
-
+	def mockServer
+	@Before
+	void setUp(){
+		mockServer = mockHttpServer()
+	}
+	@After
+	void tearDown() {
+		mockServer.stopServer()
+	}
 	@Test
 	void testMiddleware(){
-		def mockServer = mockHttpServer()
 		Spore spore = new Spore([
 			'name':'name',
-			'base_url':'http://localhost:3334/',
+			'base_url':"http://localhost:${mockServer.fixed_port-1}/",
 			'methods':[
 				"method1" : [
 					"path" : "/target/method1",
@@ -61,14 +72,12 @@ class TestMiddlewaresCallbacks extends GroovyTestCase{
 				)
 		spore.description();
 		spore.method1(["arg":"arg"]);
-		mockServer.stopServer()
 	}
 	@Test
 	void testEncodingMiddleware(){
-		def mockServer = mockHttpServer()
 		Spore spore = new Spore([
 			'name':'name',
-			'base_url':'http://localhost:3334/',
+			'base_url':"http://localhost:${mockServer.getServerPort()}/",
 			'methods':[
 				"method1" : [
 					"path" : "/target/method1",
@@ -91,10 +100,7 @@ class TestMiddlewaresCallbacks extends GroovyTestCase{
 				[:
 				]
 				)
-		println spore.methods
-		println spore.method1(["arg":"arg","barg":"barg"]).data
 		assertTrue middlewareBrowser(spore.middlewares,["spore.params":["arg":"arg","barg":"barg"]])[2]['spore.params']['sign']=="8b89c166113948bdcec3dcfbf45fa944da31cab6"
-		mockServer.stopServer()
 	}
 	@Test
 	void testSimpleClosureReturningMiddleware(){

@@ -103,7 +103,8 @@ class Spore {
 	}
 
 	/**Checks if the Json data from which the Method is to be created
-	 * is sufficient, i.e if it contains the mandatory fields.
+	 * is sufficient, i.e if it contains the mandatory fields, and respects
+	 * the specs
 	 * @param parsedJson
 	 * @return true, if the Json contains sufficient data for required fields, or 
 	 * a Map containing error messages registered under the concerned property name
@@ -119,7 +120,6 @@ class Spore {
 		}*.name
 		if (!requiredParams.disjoint(optionalParams)){
 			methodBuildError["params"]="params cannot be optional and mandatory at the same time"
-
 		}
 		(mandatoryFields-"api_base_url").each {requiredField->
 			if (!parsedJson.find{k,v->
@@ -130,11 +130,9 @@ class Spore {
 		}
 		if (!parsedJson['base_url'] && !parsedJson['api_base_url'] && !base_url){
 			methodBuildError['base_url']="Either a base_url or an api_base_url should be specified"
-
 		}
 		if (!parsedJson['method']){
 			methodBuildError['http_method']="Method is required in the description file"
-
 		}
 		return methodBuildError?.size()==0?true:methodBuildError
 	}
