@@ -49,8 +49,8 @@
 				<version>3.1</version>
 				<configuration>
 					<!-- http://maven.apache.org/plugins/maven-compiler-plugin/ -->
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.6</source>
+					<target>1.6</target>
 
 					<compilerId>groovy-eclipse-compiler</compilerId>
 					<verbose>true</verbose>
