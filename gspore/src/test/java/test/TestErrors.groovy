@@ -50,12 +50,12 @@ class TestErrors extends GroovyTestCase {
 	@Test
 	void testSporeError(){
 		Throwable e = null;
-		
+		File j = null
 		try {
 			def correctJson = this.getClass().getResource("no_name.json")
 			InputStream urlStream = correctJson.openStream();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(urlStream));
-			File j = new File("no_name.json")
+			j = new File("newno_name.json")
 			j.append(reader.getText())
 			String jsonString = j.text
 			def content=slurper.parseText(j.text)
@@ -63,6 +63,9 @@ class TestErrors extends GroovyTestCase {
 			j.delete()
 		}catch (Throwable ex) {
 			e = ex;
+		}
+		finally {
+			j.delete()
 		}
 		assertTrue(e instanceof SporeError);
 	}

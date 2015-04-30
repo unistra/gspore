@@ -36,18 +36,21 @@ class TestClientGenerator extends GroovyTestCase{
 	@Test
 	void testNoValidJsonDocument(){
 		def errorMessage=""
+		File j = null
 		try{
 			def wrongJson = this.getClass().getResource("wrong.json")
 			InputStream urlStream = wrongJson.openStream();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(urlStream));
-			File j = new File("newwrong.json")
+			j = new File("newwrong.json")
 			j.append(reader.getText())
 			String jsonString = j.text
 			def content=slurper.parseText(j.text)
 			feed(j.path)
+		}catch (JsonException je){
+			errorMessage=je.getMessage()
+		}
+		finally {
 			j.delete()
-		}catch (JsonException j){
-			errorMessage=j.getMessage()
 		}
 		
 		assertTrue errorMessage!=""
