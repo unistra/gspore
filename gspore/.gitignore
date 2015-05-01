@@ -4,3 +4,5 @@
 /target
 /newwrong.json
 /newright.json
+.gradle
+build
