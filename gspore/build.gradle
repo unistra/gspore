@@ -3,6 +3,7 @@ apply plugin: 'java'
 apply plugin: 'groovy'
 
 group = 'com.github.geoffroybeck'
+
 version = '1.0-SNAPSHOT'
 description = "A spore client"
 
@@ -37,3 +38,19 @@ compileGroovy {
     sourceCompatibility = 1.6
     targetCompatibility = 1.6
 }
+
+
+
+task fullZip(type: Zip) {
+    from configurations.runtime.allArtifacts.files
+    from configurations.runtime
+    archiveName "${baseName}-${version}-full.${extension}"
+}
+
+
+task fullJar(type: Jar) {
+    from configurations.runtime.allArtifacts.files
+    from configurations.runtime
+    archiveName "${baseName}-${version}-full.${extension}"
+}
+
