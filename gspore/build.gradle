@@ -41,16 +41,16 @@ compileGroovy {
 
 
 
-task fullZip(type: Zip) {
+task fullZip(type: Zip, dependsOn: [':compileGroovy', ':processResources']) {
     from configurations.runtime.allArtifacts.files
     from configurations.runtime
     archiveName "${baseName}-${version}-full.${extension}"
 }
 
 
-task fullJar(type: Jar) {
-    from configurations.runtime.allArtifacts.files
-    from configurations.runtime
+task fullJar(type: Jar, dependsOn: [':compileGroovy', ':processResources']) {
+    from files(sourceSets.main.output.classesDir)
+    from configurations.runtime.asFileTree.files.collect { zipTree(it) }
     archiveName "${baseName}-${version}-full.${extension}"
 }
 
