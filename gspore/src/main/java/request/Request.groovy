@@ -75,8 +75,10 @@ class Request {
 			headers.'User-Agent' = "GSPORE"
 			headers.'Accept' = contentTypes.ANY
 			if (["POST", "PUT", "PATCH"].contains(request.method)){
-//				send contentTypesNormalizer(args),args['spore.payload']
-				send ct, args['spore.payload']
+				
+//				application/x-www-form-urlencoded
+			//send contentTypesNormalizer(args),args['spore.payload']
+				send "application/x-www-form-urlencoded", args['spore.payload']
 			}
 		}
 		return ret
