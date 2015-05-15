@@ -18,11 +18,11 @@ class RequestUtils {
 	 * And is useless now. Just rewrite it, or
 	 * remove it, please.
 	 */
-	public static contentTypesNormalizer(args){
-		def normalized
-		def format=args['spore.format']?:args['formats']?:args['global_formats']?:"application/json"
-		return format=="json"||format.contains("json")?"application/json":format
-	}
+//	public static contentTypesNormalizer(args){
+//		def normalized
+//		def format=args['spore.format']?:args['formats']?:args['global_formats']?:"application/json"
+//		return format=="json"||format.contains("json")?"application/json":format
+//	}
 	public static finalPath(args){
 		args['finalPath']
 	}

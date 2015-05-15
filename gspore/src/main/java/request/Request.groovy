@@ -14,10 +14,11 @@ import static groovyx.net.http.ContentType.XML
 import static groovyx.net.http.ContentType.BINARY
 import static groovyx.net.http.ContentType.URLENC
 import static groovyx.net.http.ContentType.HTML
-import static utils.RequestUtils.contentTypesNormalizer
+//import static utils.RequestUtils.contentTypesNormalizer
 import static utils.RequestUtils.finalPath
 import static utils.RequestUtils.finalUrl
 import static utils.RequestUtils.domainNameAndServerPort
+import errors.UnexpectedStatusError
 
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 
@@ -75,11 +76,15 @@ class Request {
 			headers.'User-Agent' = "GSPORE"
 			headers.'Accept' = contentTypes.ANY
 			if (["POST", "PUT", "PATCH"].contains(request.method)){
-				
-//				application/x-www-form-urlencoded
-			//send contentTypesNormalizer(args),args['spore.payload']
+            //  application/x-www-form-urlencoded
+			//  send contentTypesNormalizer(args),args['spore.payload']
 				send "application/x-www-form-urlencoded", args['spore.payload']
 			}
+		}
+		def excepted_status = args['spore.expected_status']
+		
+		if (args['spore.expected_status'] && !args['spore.expected_status'].collect{it.toString()}.contains(ret.response.status.toString())){
+			throw new UnexpectedStatusError("UnexpectedStatusError status ${ret.response.status}")
 		}
 		return ret
 	}

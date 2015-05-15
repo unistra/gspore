@@ -5,9 +5,6 @@ import java.util.Map;
 
 class JAuth extends Jizzleware{
 	def Authorization
-	public JAuth(arg0) {
-		super(arg0);
-	}
 	public JAuth(Map arg0) {
 		super(arg0);
 	}
