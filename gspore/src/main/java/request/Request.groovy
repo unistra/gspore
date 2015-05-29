@@ -1,5 +1,6 @@
 package request
 
+import groovy.json.JsonSlurper
 import groovyx.net.http.HTTPBuilder
 import static groovyx.net.http.Method.GET
 import static groovyx.net.http.Method.POST
@@ -31,17 +32,20 @@ class Request {
 		def requiresScan={j->j.class in org.apache.http.conn.EofSensorInputStream }
 		def data = {s->s.hasNext() ? s.next() : ""}
 		def ret
+		def requiredContentType = args['spore.headers']?.keySet().contains('Content-Type') ? args['spore.headers']['Content-Type'] : args["spore.format"]
+		JsonSlurper j = new JsonSlurper()
 		/*The response behavior
 		 *when the request is successful
 		 */
 		def success={resp,json->
+			
 			String statusCode=String?.valueOf(resp.statusLine.statusCode)
 			if (args['success'] ){
 				ret = args['success'](resp,json)
 			}else{
 				if (requiresScan(json)){
 					def s = new java.util.Scanner(json).useDelimiter("\\A");
-					ret=['response':resp,"data":data(s)];
+					ret=['response':resp,"data":requiredContentType =="application/json"?j.parseText(data(s)):data(s)];
 				}else{
 				ret=['response':resp,"data":json]
 				}
@@ -52,6 +56,7 @@ class Request {
 		 */
 		def failure={resp,json->
 				if (requiresScan(json)){
+					println "if"+requiredContentType
 					def s = new java.util.Scanner(json).useDelimiter("\\A");
 					ret=['response':resp,"data":data(s)];
 				}else{
@@ -67,7 +72,7 @@ class Request {
 		 */
 		def ct = args['spore.headers']?.keySet().contains('Content-Type') ? args['spore.headers']['Content-Type'] : args["spore.format"]
 //		args.containsKey("spore.format") && args["spore.format"]!=""?ct=args["spore.format"]:""
-		builder.request(finalUrl(args),methods[args['method']], ct) {
+		builder.request(finalUrl(args),methods[args['method']], contentTypes.ANY) {
 			uri.path += finalPath(args)
 			uri.query = args['QUERY_STRING']
 			args["spore.headers"].each{k,v->

@@ -20,7 +20,10 @@ import static feed.SporeFeeder.feed
 import static holder.Holder.getClient
 
 class TestEffectiveCalls extends GroovyTestCase{
-
+	@Rule
+	public java.lang.reflect.Method myCondition(){
+	return null
+    }
 	@ClassRule
 	public static WireMockClassRule wireMockRule = new WireMockClassRule(8089);
 
@@ -71,6 +74,7 @@ class TestEffectiveCalls extends GroovyTestCase{
 					}
 				]
 				)
+		println spore.method1([:]).data
 		assertTrue ((spore.method1([:])).data == ['animals':[
 				'cats',
 				'wolverine',
@@ -147,7 +151,7 @@ class TestEffectiveCalls extends GroovyTestCase{
 		spore.enable(middleware.AuthToken,
 				["authorization":'token']
 				)
-
+		println spore.method1(["arg":"value","barg":"value2"]).data
 		assertTrue ((spore.method1(["arg":"value","barg":"value2"])).data == ["some":"stuff1"])
 	}
 	@Test
@@ -181,6 +185,7 @@ class TestEffectiveCalls extends GroovyTestCase{
 		spore.enable(middleware.AuthToken,
 				["authorization":'token']
 				)
+		println "OOOOOOOOO"+(spore.method1("payload":["bla":"bla"])).data
 		assertTrue (spore.method1("payload":["bla":"bla"]).data == '{"some":"stuff1"}')
 	}
 	@Test
@@ -205,45 +210,45 @@ class TestEffectiveCalls extends GroovyTestCase{
 			'comments_for_post'
 		])
 	}
-	@Test
-	void testJizzleware(){
-		wireMockRule.start()
-		wireMockRule.stubFor(get(urlEqualTo("/thing"))
-				.willReturn(aResponse()
-				.withStatus(200)
-				.withBodyFile("thing.json")
-				));
-		Spore spore = new Spore([
-			'name':'name',
-			'base_url':"http://localhost:8089",
-			'methods':[
-				"method1" : [
-					"path" : "/thing",
-					"method" : "GET",
-				]
-			]
-		])
-		spore.enable(
-				middleware.Jizzleware,
-				[
-					processRequest:{args->
-						args['spore.headers'] = ["Authorization":64536546]
-						return null
-					}
-				]
-				)
-		assertTrue ((spore.method1([:])).data == ['animals':[
-				'cats',
-				'wolverine',
-				'rat',
-				'boar',
-				'bear',
-				'giraffe',
-				'pegasus',
-				'unicorn',
-				'pony'
-			]])
-	}
+//	@Test
+//	void testJizzleware(){
+//		wireMockRule.start()
+//		wireMockRule.stubFor(get(urlEqualTo("/thing"))
+//				.willReturn(aResponse()
+//				.withStatus(200)
+//				.withBodyFile("thing.json")
+//				));
+//		Spore spore = new Spore([
+//			'name':'name',
+//			'base_url':"http://localhost:8089",
+//			'methods':[
+//				"method1" : [
+//					"path" : "/thing",
+//					"method" : "GET",
+//				]
+//			]
+//		])
+////		def m = java.lang.Integer.getMethod('toString',null)
+////		java.lang.reflect.Method m
+//		def m = this.metaClass.getMetaMethod("myCondition")
+//		spore.enableIf(
+//				middleware.JAuth,
+//				[
+//					"authorization":"blabla"
+//				],m
+//				)
+//		assertTrue ((spore.method1([:])).data == ['animals':[
+//				'cats',
+//				'wolverine',
+//				'rat',
+//				'boar',
+//				'bear',
+//				'giraffe',
+//				'pegasus',
+//				'unicorn',
+//				'pony'
+//			]])
+//	}
 
 }
 
