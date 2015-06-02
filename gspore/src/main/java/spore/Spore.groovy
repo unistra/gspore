@@ -114,12 +114,11 @@ class Spore {
 		Map methodBuildError=[:]
 		List requiredParams = parsedJson['required_params']?:[]
 		List optionalParams = parsedJson['optional_params']?:[]
-
 		def mandatoryFields=spore.Method.declaredFields.findAll {
 			Mandatory in it.declaredAnnotations*.annotationType()
 		}*.name
 		if (!requiredParams.disjoint(optionalParams)){
-			methodBuildError["params"]="params cannot be optional and mandatory at the same time"
+			methodBuildError["params"]="params cannot be optional and mandatory at the same time found in ${parsedJson['name']}"
 		}
 		(mandatoryFields-"api_base_url").each {requiredField->
 			if (!parsedJson.find{k,v->
@@ -189,6 +188,9 @@ class Spore {
 		def instance = middleware.newInstance(args)
 		def clos= instance.methodJizz(conditionName)
 		middlewares[clos]= instance
+	}
+	def invoke(name,args){
+		this."$name"(args)
 	}
 	//TODO
 	def addDefault(param,value){

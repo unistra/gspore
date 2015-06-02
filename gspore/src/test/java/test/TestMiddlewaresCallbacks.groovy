@@ -36,43 +36,43 @@ class TestMiddlewaresCallbacks extends GroovyTestCase{
 	void tearDown() {
 		mockServer.stopServer()
 	}
-	@Test
-	void testMiddleware(){
-		Spore spore = new Spore([
-			'name':'name',
-			'base_url':"http://localhost:${mockServer.fixed_port-1}/",
-			'methods':[
-				"method1" : [
-					"path" : "/target/method1",
-					"method" : "GET",
-					"formats":"application/json",
-					"required_params":["arg"]]
-			]
-		])
-		spore.enable(
-				middleware.Middleware,
-				[
-					processRequest:{args->
-						args['spore.headers'] = ["Authorization":64536546]
-						return null
-					}
-				]
-				)
-		spore.enable(
-				middleware.JContentTypeSetter,
-				[:]
-				)
-		spore.enable(
-				middleware.JAuth,
-				["Authorization":"YES"]
-				)
-		spore.enable(
-				middleware.JAuth,
-				["Authorization":"YES"]
-				)
-		spore.description();
-		spore.method1(["arg":"arg"]);
-	}
+//	@Test
+//	void testMiddleware(){
+//		Spore spore = new Spore([
+//			'name':'name',
+//			'base_url':"http://localhost:${mockServer.fixed_port-1}/",
+//			'methods':[
+//				"method1" : [
+//					"path" : "/target/method1",
+//					"method" : "GET",
+//					"formats":"application/json",
+//					"required_params":["arg"]]
+//			]
+//		])
+//		spore.enable(
+//				middleware.Middleware,
+//				[
+//					processRequest:{args->
+//						args['spore.headers'] = ["Authorization":64536546]
+//						return null
+//					}
+//				]
+//				)
+//		spore.enable(
+//				middleware.JContentTypeSetter,
+//				[:]
+//				)
+//		spore.enable(
+//				middleware.JAuth,
+//				["Authorization":"YES"]
+//				)
+//		spore.enable(
+//				middleware.JAuth,
+//				["Authorization":"YES"]
+//				)
+//		spore.description();
+//		spore.method1(["arg":"arg"]);
+//	}
 	@Test
 	void testEncodingMiddleware(){
 		Spore spore = new Spore([

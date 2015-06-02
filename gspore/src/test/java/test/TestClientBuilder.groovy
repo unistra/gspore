@@ -63,12 +63,12 @@ class TestClientBuilder extends GroovyTestCase {
 		}catch(MethodError me){
 		errorMessage=errorMessage!=""?errorMessage+"/"+me.getMessage():me.getMessage()
 		}
-		assertEquals "errors.MethodError: params cannot be optional and mandatory at the same time",errorMessage
+		assertEquals "errors.MethodError: params cannot be optional and mandatory at the same time found in method1",errorMessage
 	}
-	@Test
-	void testDefaultAttrs(){
-		
-	}
+//	@Test
+//	void testDefaultAttrs(){
+//		
+//	}
 	
 	@Test
 	void testDynamicMethodInjection(){

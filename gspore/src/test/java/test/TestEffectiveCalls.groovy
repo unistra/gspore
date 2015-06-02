@@ -74,7 +74,6 @@ class TestEffectiveCalls extends GroovyTestCase{
 					}
 				]
 				)
-		println spore.method1([:]).data
 		assertTrue ((spore.method1([:])).data == ['animals':[
 				'cats',
 				'wolverine',
@@ -185,7 +184,6 @@ class TestEffectiveCalls extends GroovyTestCase{
 		spore.enable(middleware.AuthToken,
 				["authorization":'token']
 				)
-		println "OOOOOOOOO"+(spore.method1("payload":["bla":"bla"])).data
 		assertTrue (spore.method1("payload":["bla":"bla"]).data == '{"some":"stuff1"}')
 	}
 	@Test
