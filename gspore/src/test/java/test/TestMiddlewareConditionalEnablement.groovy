@@ -75,6 +75,7 @@ class TestMiddlewareConditionalEnablement extends GroovyTestCase{
 			){args->
 			args['REQUEST_METHOD']=="GET"
 		}
+			
 			def results = middlewareBrowser(spore.middlewares,environ)
 			assertTrue !results[2]['spore.headers']
 	}

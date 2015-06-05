@@ -90,7 +90,7 @@ class Method {
 			'spore.format': contentTypesNormalizer(),
 			'spore.userinfo': urlParse(base_url).userInfo,
 			'wsgi.url_scheme': urlParse(base_url).scheme,
-			'name':name
+			'spore.method_name':name
 		]
 	}
 	
@@ -118,6 +118,7 @@ class Method {
 		 * either Closures,
 		 * in reverse order.
 		 */
+		responseClosures['success']=[]
 		storedCallbacks.reverseEach{
 			/**The stored callback is 
 			 * a java.lang.reflect.Method
@@ -126,13 +127,14 @@ class Method {
 				def declaringClass = it.getDeclaringClass()
 				Object obj = declaringClass.newInstance([:])
 				it.invoke(obj, middlewareModifiedenviron)
-				responseClosures['success']=it
+				responseClosures['success']+=it
 			}
 			/**The stored callback
 			 * is a Closure
 			 */
 			else{
-				responseClosures['success']=it
+				
+				responseClosures['success']+=it
 			}
 		}
 		
@@ -153,9 +155,16 @@ class Method {
 			/**Effective processing of the request
 			 * */
 			if (errors.size()==0){
-				responseClosures.each{clef,valeur->
+				responseClosures.findAll({k,v->k!="success"}).each{clef,valeur->
 					environ[clef]=valeur
 				}
+				if (responseClosures['success']){
+					environ['success']=[]
+					responseClosures['success'].each{
+						environ['success']+=it
+					}
+				}
+				
 				try{
 				ret = requestSend(environ)
 				}catch(Exception e){
@@ -226,6 +235,7 @@ class Method {
 			else if (condition(environ)){
 				callback = middleware(environ)
 			}
+			
 			/**break loop
 			 */
 			if (callback in Response){

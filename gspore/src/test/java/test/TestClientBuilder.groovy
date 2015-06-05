@@ -73,10 +73,9 @@ class TestClientBuilder extends GroovyTestCase {
 	@Test
 	void testDynamicMethodInjection(){
 	
-		
 		Spore spore= new Spore(args)
 	
-		assertTrue spore.description()==["method1","method2"]
+		assertTrue spore.description() == ["method1","method2"]
 	}
 	
 }

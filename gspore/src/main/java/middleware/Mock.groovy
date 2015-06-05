@@ -17,7 +17,7 @@ class Mock extends middleware.Middleware{
 	def processRequest(environ){
 		def args = [:]
 		this?."fakes"?.each{path,fakeResponse->
-			if (path == ('/'+environ['name'])){
+			if (path == ('/'+environ['spore.method_name'])){
 				args=fakeResponse
 			}
 		}

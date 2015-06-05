@@ -45,7 +45,7 @@ class TestMethodBaseUrl extends GroovyTestCase{
 				processRequest:{env->
 					def arguments = [:]
 					delegate?."fakes"?.each{path,fakeResponse->
-						if (path == ('/'+env['name'])){
+						if (path == ('/'+env['spore.method_name'])){
 							arguments=fakeResponse
 						}
 					}
@@ -107,7 +107,7 @@ class TestMethodBaseUrl extends GroovyTestCase{
 				processRequest:{env->
 					def arguments = [:]
 					delegate?."fakes"?.each{path,fakeResponse->
-						if (path == ('/'+env['name'])){
+						if (path == ('/'+env['spore.method_name'])){
 							arguments=fakeResponse
 						}
 					}
