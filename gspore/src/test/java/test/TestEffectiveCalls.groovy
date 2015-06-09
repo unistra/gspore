@@ -154,7 +154,7 @@ class TestEffectiveCalls extends GroovyTestCase{
 	}
 	@Test
 	void testPost(){
-
+//
 //		instanceRule.start()
 //
 //		instanceRule.stubFor(post(urlPathEqualTo("/target"))
@@ -163,7 +163,7 @@ class TestEffectiveCalls extends GroovyTestCase{
 //				.withBodyFile("thing2.json")
 //				));
 //		Spore spore = new Spore(['name':'name',
-//			'base_url':'http://localhost:8089',
+//			'base_url':'http:localhost:8089',
 //			'methods':[
 //				"method1" : [
 //					"path" : "/target",

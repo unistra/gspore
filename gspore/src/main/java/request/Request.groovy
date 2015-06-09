@@ -93,6 +93,7 @@ class Request {
 		if (args['spore.expected_status'] && !args['spore.expected_status'].collect{it.toString()}.contains(ret.response.status.toString())){
 			throw new UnexpectedStatusError("UnexpectedStatusError status ${ret.response.status}")
 		}
+		//middlewares parsing.
 		def callbacks = args['success'].inject({it}){prev,next->
 			prev<<next
 		}

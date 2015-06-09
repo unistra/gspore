@@ -5,31 +5,31 @@ class Paginator extends middleware.Middleware{
 	def results=[]
 	def spore
 	def isLooping= false
-	def next_params=""
 	public Paginator() {
 		// TODO Auto-generated constructor stub
 	}
 	def processResponse(args){
 		if (args['spore.method_name'] && args['spore.method_name']!=""){
 			this.methodName=args['spore.method_name']
-			
 		}
-			return !isLooping?{
-				return loop(it)
-				}:null
-			}
-	
+		return !isLooping?{ return loop(it) }:null
+	}
+	static returnedNextParams(stuff){
+		isAHashMap(stuff)  && stuff['next_params']!=null
+	}
+	static isAHashMap(obj){
+		obj.getClass()== java.util.HashMap
+	}
 	def loop(stuff){
 		isLooping = true
-		results+=stuff["results"]
-		if (stuff['next_params']){
+		results+=isAHashMap(stuff)?stuff["results"]:stuff
+		if (returnedNextParams(stuff)){
 			def params = stuff["next_params"]
 			params['format']="json"
-			next_params=params
 			loop(spore."$methodName"(params).data)
 		}else{
-		isLooping=false
-		return results
+			isLooping=false
+			return results
 		}
 	}
 }
