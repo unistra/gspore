@@ -76,7 +76,10 @@ class Request {
 //		args.containsKey("spore.format") && args["spore.format"]!=""?ct=args["spore.format"]:""
 		builder.request(finalUrl(args),methods[args['method']], contentTypes.ANY) {
 			uri.path += finalPath(args)
-			uri.query = args['QUERY_STRING']
+			uri.query = args['QUERY_STRING'].findAll {
+				it?.key != "payload"
+			}
+			
 			args["spore.headers"].each{k,v->
 				headers."$k"="$v"
 			}
