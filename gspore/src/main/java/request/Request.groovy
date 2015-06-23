@@ -32,7 +32,7 @@ class Request {
 		def requiresScan={j->j.class in org.apache.http.conn.EofSensorInputStream }
 		def data = {s->s.hasNext() ? s.next() : ""}
 		def ret
-		def requiredContentType = args['spore.headers']?.keySet().contains('Content-Type') ? args['spore.headers']['Content-Type'] : args["spore.format"]
+		def requiredContentType = args['spore.headers']?.keySet()?.contains('Content-Type') ? args['spore.headers']['Content-Type'] : args["spore.format"]
 		JsonSlurper j = new JsonSlurper()
 		/*The response behavior
 		 *when the request is successful
@@ -72,7 +72,7 @@ class Request {
 		 *the spot where the request is actually sent.
 		 *Its handlers are the response formatters.
 		 */
-		def ct = args['spore.headers']?.keySet().contains('Content-Type') ? args['spore.headers']['Content-Type'] : args["spore.format"]
+//		def ct = args['spore.headers']?.keySet()?.contains('Content-Type') ? args['spore.headers']['Content-Type'] : args["spore.format"]
 //		args.containsKey("spore.format") && args["spore.format"]!=""?ct=args["spore.format"]:""
 		builder.request(finalUrl(args),methods[args['method']], contentTypes.ANY) {
 			uri.path += finalPath(args)

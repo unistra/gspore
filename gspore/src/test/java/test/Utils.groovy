@@ -11,7 +11,6 @@ class Utils{
 		MockHttpServer mockServer = new MockHttpServer(3333);
 		mockServer.startServer();
 		String url = "http://localhost:" + (mockServer.getServerPort()+1) + "/target/method1";
-		println url
 		MockHttpServer.MockHttpServerResponse response = new MockHttpServer.MockHttpServerResponse();
 		response.setMockResponseContent('{"some":"response"}');
 		response.setMockResponseCode(200);
@@ -25,7 +24,6 @@ class Utils{
 		MockHttpServer mockServer = new MockHttpServer(3333);
 		mockServer.startServer();
 		String url = "http://localhost:" + (mockServer.getServerPort()+1) + "/api/description.json";
-		println url
 		MockHttpServer.MockHttpServerResponse response = new MockHttpServer.MockHttpServerResponse();
 		def correctJson = this.getClass().getResource("right.json")
 		InputStream urlStream = correctJson.openStream();

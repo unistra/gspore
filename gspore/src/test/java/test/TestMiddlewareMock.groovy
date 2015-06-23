@@ -67,7 +67,6 @@ class TestMiddlewareMock extends GroovyTestCase {
 				]
 				)
 		def results = middlewareBrowser(spore.middlewares,environ)
-		println "ouesch"+results
 		assertTrue results[1] == ['headers':['Content-Type':'text-plain'], 'status_code':200, 'text':'OK']
 	}
 	@Test
@@ -110,12 +109,8 @@ class TestMiddlewareMock extends GroovyTestCase {
 					]
 				]
 				)
-		//
-		println "ah?"
 
 		def results = middlewareBrowser(spore.middlewares,environ)
-		
-		println "mec"+results[1]
 		assertTrue results[1] == ['headers':['Content-Type':'text-plain'], 'status_code':200, 'text':'OK']
 	}
 }
