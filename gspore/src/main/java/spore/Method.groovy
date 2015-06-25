@@ -133,8 +133,9 @@ class Method {
 			 * is a Closure
 			 */
 			else{
-				
+				if (it instanceof Closure){
 				responseClosures['success']+=it
+				}
 			}
 		}
 		

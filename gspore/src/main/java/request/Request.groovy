@@ -15,12 +15,15 @@ import static groovyx.net.http.ContentType.XML
 import static groovyx.net.http.ContentType.BINARY
 import static groovyx.net.http.ContentType.URLENC
 import static groovyx.net.http.ContentType.HTML
-//import static utils.RequestUtils.contentTypesNormalizer
 import static utils.RequestUtils.finalPath
 import static utils.RequestUtils.finalUrl
 import static utils.RequestUtils.domainNameAndServerPort
+import static utils.RequestUtils.requiresScan
+import static utils.RequestUtils.data
+import static utils.RequestUtils.statusIsNotInExpectedStatuses
+import static utils.RequestUtils.queryString
+import static utils.RequestUtils.requiredContentType
 import errors.UnexpectedStatusError
-
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 
 class Request {
@@ -29,22 +32,16 @@ class Request {
 	static HTTPBuilder builder = new HTTPBuilder();
 	
 	public static def requestSend(args){
-		def requiresScan={j->j.class in org.apache.http.conn.EofSensorInputStream }
-		def data = {s->s.hasNext() ? s.next() : ""}
 		def ret
-		def requiredContentType = args['spore.headers']?.keySet()?.contains('Content-Type') ? args['spore.headers']['Content-Type'] : args["spore.format"]
+		def requiredContentType = requiredContentType(args)
 		JsonSlurper j = new JsonSlurper()
 		/*The response behavior
 		 *when the request is successful
 		 */
 		def success={resp,json->
-			
 			String statusCode=String?.valueOf(resp.statusLine.statusCode)
 			if (args['success'] ){
-//				def callbacks = args['success'].inject({it}){prev,next->
-//					prev<<next
-//				}
-				ret = ['response':resp,"data":json]
+				ret = ['response':resp,"data":json?:""]
 			}else{
 				if (requiresScan(json)){
 					def s = new java.util.Scanner(json).useDelimiter("\\A");
@@ -59,6 +56,7 @@ class Request {
 		 */
 		def failure={resp,json->
 				if (requiresScan(json)){
+					
 					def s = new java.util.Scanner(json).useDelimiter("\\A");
 					ret=['response':resp,"data":data(s)];
 				}else{
@@ -67,40 +65,30 @@ class Request {
 		}
 		builder.handler.success=success
 		builder.handler.failure=failure
-		
 		/*The builder's request method is 
 		 *the spot where the request is actually sent.
 		 *Its handlers are the response formatters.
 		 */
-//		def ct = args['spore.headers']?.keySet()?.contains('Content-Type') ? args['spore.headers']['Content-Type'] : args["spore.format"]
-//		args.containsKey("spore.format") && args["spore.format"]!=""?ct=args["spore.format"]:""
 		builder.request(finalUrl(args),methods[args['method']], contentTypes.ANY) {
 			uri.path += finalPath(args)
-			uri.query = args['QUERY_STRING'].findAll {
-				it?.key != "payload"
-			}
-			
+			uri.query = queryString(args)
 			args["spore.headers"].each{k,v->
 				headers."$k"="$v"
 			}
 			headers.'User-Agent' = "GSPORE"
 			headers.'Accept' = contentTypes.ANY
 			if (["POST", "PUT", "PATCH"].contains(request.method)){
-            //  application/x-www-form-urlencoded
-			//  send contentTypesNormalizer(args),args['spore.payload']
 				send "application/x-www-form-urlencoded", args['spore.payload']
 			}
 		}
-		def excepted_status = args['spore.expected_status']
-		
-		if (args['spore.expected_status'] && !args['spore.expected_status'].collect{it.toString()}.contains(ret.response.status.toString())){
+		if (statusIsNotInExpectedStatuses(args,ret)){
 			throw new UnexpectedStatusError("UnexpectedStatusError status ${ret.response.status}")
 		}
 		//middlewares parsing.
 		def callbacks = args['success'].inject({it}){prev,next->
 			prev<<next
 		}
-		ret['data']=callbacks(ret['data'])
+		ret['data']=callbacks(ret['data'])?:""
 		return ret
 	}
 }

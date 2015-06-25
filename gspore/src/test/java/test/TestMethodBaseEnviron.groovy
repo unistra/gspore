@@ -26,7 +26,6 @@ class TestMethodBaseEnviron extends GroovyTestCase{
 			formats:" application/json",
 			
 		])
-		println method.baseEnviron()
 	}
 	@Test
 	void testScriptName(){
@@ -38,7 +37,6 @@ class TestMethodBaseEnviron extends GroovyTestCase{
 			formats:" application/json",
 			
 		])
-		println method.baseEnviron()
 	}
 	@Test
 	void testPathAndQuery(){
@@ -50,7 +48,6 @@ class TestMethodBaseEnviron extends GroovyTestCase{
 			formats:" application/json",
 			
 		])
-		println method.baseEnviron()
 	}
 	
 	@Test
@@ -63,7 +60,6 @@ class TestMethodBaseEnviron extends GroovyTestCase{
 			formats:" application/json",
 			
 		])
-		println method.baseEnviron()
 	}
 	@Test
 	void testServerPortNotSpecifiedAndProtocolIsHttp(){
