@@ -56,7 +56,6 @@ class Request {
 		 */
 		def failure={resp,json->
 				if (requiresScan(json)){
-					
 					def s = new java.util.Scanner(json).useDelimiter("\\A");
 					ret=['response':resp,"data":data(s)];
 				}else{
