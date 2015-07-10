@@ -19,7 +19,7 @@ class Spore {
 	def version
 	def authentication
 	@Mandatory
-	List methods=[]// test purposes
+	List methods=[]// test purpose
 	def meta
 	def middlewares=[:]
 	def user_agent
@@ -30,13 +30,13 @@ class Spore {
 	 * the default initialization doesn't work
 	 * */
 	Spore(args){
-		originalMethods=this.metaClass.methods*.name
+		originalMethods=metaClass.methods*.name
 		sporeErrors(args)
 		/** Saturations of properties 
 		 *  with matching parsed JSON entries
 		 */
 		args?.each(){k,v->
-			if (this.properties.find({it.key==k && !['methods'].contains(k)})){
+			if (properties.find({it.key==k && !['methods'].contains(k)})){
 				this."$k"=v
 			}
 		}
@@ -51,11 +51,10 @@ class Spore {
 		 * */
 		args?."methods".each(){methodName,value->
 			try{
-				methods+=methodName
 				def m = createMethod([
 					name:methodName,
 					/**Inherited from spore if not specified in the parsed Json*/
-					base_url:![null, ""].contains(value['base_url'])?value['base_url']:base_url,
+					base_url:value['base_url']?:base_url,
 					/**Found in the Json [k]*/
 					path:value['path'],
 					method:value['method'],
@@ -77,29 +76,34 @@ class Spore {
 				 *is dynamically added to the Spore 
 				 *If no Method could be created, nothing happens.
 				 **/
-				m?.class==spore.Method?this.metaClass[methodName]=m.request:""
+				m?.class==spore.Method?addMethod(methodName,m):""
 			}catch (MethodError me){
 				throw new MethodError(me)
 			}
 		}
 	}
-
-	/**@param parsedJson : the Json from which the Method should
+	
+	/**@param json : the json from which the Method should
 	 * be created.
 	 * @return either a Method either a String describing what prevented 
 	 * the method from being created.
 	 */
-	def createMethod(parsedJson)throws MethodError{
-		def checkResult = methodIntegrityCheck(parsedJson)
+	def createMethod(json)throws MethodError{
+		def checkResult = methodIntegrityCheck(json)
 		if (checkResult==true){
-			return new Method(parsedJson)
+			return new Method(json)
 		}else{
 			String message=checkResult.values().join(';')
-		
-			
 			throw new MethodError(message,new Throwable(message))
 			return checkResult
 		}
+	}
+	
+	/**Adds the method to the metaClass
+	*registers it in methods*/
+	def addMethod={name,stuff->
+		this.metaClass[name]=stuff.request
+		methods+=name
 	}
 
 	/**Checks if the Json data from which the Method is to be created
@@ -109,31 +113,31 @@ class Spore {
 	 * @return true, if the Json contains sufficient data for required fields, or 
 	 * a Map containing error messages registered under the concerned property name
 	 */
-	def methodIntegrityCheck(parsedJson){
+	def methodIntegrityCheck(json){
 
-		Map methodBuildError=[:]
-		List requiredParams = parsedJson['required_params']?:[]
-		List optionalParams = parsedJson['optional_params']?:[]
+		Map errors=[:]
+		List requiredParams = json['required_params']?:[]
+		List optionalParams = json['optional_params']?:[]
 		def mandatoryFields=spore.Method.declaredFields.findAll {
 			Mandatory in it.declaredAnnotations*.annotationType()
 		}*.name
 		if (!requiredParams.disjoint(optionalParams)){
-			methodBuildError["params"]="params cannot be optional and mandatory at the same time found in ${parsedJson['name']}"
+			errors["params"]="params cannot be optional and mandatory at the same time found in ${json['name']}"
 		}
 		(mandatoryFields-"api_base_url").each {requiredField->
-			if (!parsedJson.find{k,v->
+			if (!json.find{k,v->
 				k==requiredField
 			}){
-				methodBuildError[requiredField]="$requiredField is a required field for generated methods, $requiredField couldn't  be generated"
+				errors[requiredField]="$requiredField is a required field for generated methods, $requiredField couldn't  be generated"
 			}
 		}
-		if (!parsedJson['base_url'] && !parsedJson['api_base_url'] && !base_url){
-			methodBuildError['base_url']="Either a base_url or an api_base_url should be specified"
+		if (!json['base_url'] && !json['api_base_url'] && !base_url){
+			errors['base_url']="Either a base_url or an api_base_url should be specified"
 		}
-		if (!parsedJson['method']){
-			methodBuildError['http_method']="Method is required in the description file"
+		if (!json['method']){
+			errors['http_method']="Method is required in the description file"
 		}
-		return methodBuildError?.size()==0?true:methodBuildError
+		return errors?.size()==0?true:errors
 	}
 
 
