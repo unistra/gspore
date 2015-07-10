@@ -31,7 +31,7 @@ class RequestUtils {
 	static def queryString = {a->
 		a['QUERY_STRING'].findAll { it?.key != "payload" }
 		}
-	static def requiresScan={j->j?.class in org.apache.http.conn.EofSensorInputStream }
+	static def requiresScan={j->j?.class in org.apache.http.conn.EofSensorInputStream || j?.class in java.io.InputStreamReader }
 	static def data = {s->s.hasNext() ? s.next() : ""}
 	static def requiredContentType = {args->args['spore.headers']?.keySet()?.contains('Content-Type') ? args['spore.headers']['Content-Type'] : args["spore.format"]}
 	public static finalUrl(args){

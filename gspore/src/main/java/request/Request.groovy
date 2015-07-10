@@ -83,10 +83,12 @@ class Request {
 		if (statusIsNotInExpectedStatuses(args,ret)){
 			throw new UnexpectedStatusError("UnexpectedStatusError status ${ret.response.status}")
 		}
+		
 		//middlewares parsing.
 		def callbacks = args['success'].inject({it}){prev,next->
 			prev<<next
 		}
+		
 		ret['data']=callbacks(ret['data'])?:""
 		return ret
 	}
