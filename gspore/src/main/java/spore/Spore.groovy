@@ -49,40 +49,41 @@ class Spore {
 		 * signature that must be fulfilled with
 		 * a parameter Map.
 		 * */
-		args?."methods".each(){methodName,value->
+		args?."methods".each(){name,value->
 			try{
-				def m = createMethod([
-					name:methodName,
-					/**Inherited from spore if not specified in the parsed Json*/
-					base_url:value['base_url']?:base_url,
-					/**Found in the Json [k]*/
-					path:value['path'],
-					method:value['method'],
-					required_params:value['required_params'],
-					optional_params:value['optional_params'],
-					expected_status:value['expected_status'],
-					required_payload:value['required_payload'],
-					description:value['description'],
-					authentication:value['authentication'],
-					formats:value['formats'],
-					documentation:value['documentation'],
-					defaults : value['defaults'],
-					/**Inherited from Spore*/
-					middlewares:middlewares,
-					global_authentication:authentication,
-					global_formats:formats
-				])
 				/**Next is the spot where the Method
 				 *is dynamically added to the Spore 
 				 *If no Method could be created, nothing happens.
 				 **/
-				m?.class==spore.Method?addMethod(methodName,m):""
+				add(*createMethod(methodArgumentsMap(name,value)))
 			}catch (MethodError me){
 				throw new MethodError(me)
 			}
 		}
 	}
-	
+	def methodArgumentsMap(methodName,args){
+		[
+			name:methodName,
+			/**Inherited from spore if not specified in the parsed Json*/
+			base_url:args['base_url']?:base_url,
+			/**Found in the Json [k]*/
+			path:args['path'],
+			method:args['method'],
+			required_params:args['required_params'],
+			optional_params:args['optional_params'],
+			expected_status:args['expected_status'],
+			required_payload:args['required_payload'],
+			description:args['description'],
+			authentication:args['authentication'],
+			formats:args['formats'],
+			documentation:args['documentation'],
+			defaults : args['defaults'],
+			/**Inherited from Spore*/
+			middlewares:middlewares,
+			global_authentication:authentication,
+			global_formats:formats
+		]
+	}
 	/**@param json : the json from which the Method should
 	 * be created.
 	 * @return either a Method either a String describing what prevented 
@@ -91,11 +92,11 @@ class Spore {
 	def createMethod(json)throws MethodError{
 		def checkResult = methodIntegrityCheck(json)
 		if (checkResult==true){
-			return new Method(json)
+			return [new Method(json),json['name']]
 		}else{
 			String message=checkResult.values().join(';')
 			throw new MethodError(message,new Throwable(message))
-			return checkResult
+			return [checkResult,json['name']]
 		}
 	}
 	
@@ -105,7 +106,14 @@ class Spore {
 		this.metaClass[name]=stuff.request
 		methods+=name
 	}
-
+	def add(m, methodName){
+		m?.class==spore.Method?addMethod(methodName,m):""
+	}
+	def getMethodMandatoryFields(){
+		spore.Method.declaredFields.findAll {
+			Mandatory in it.declaredAnnotations*.annotationType()
+		}*.name
+	}
 	/**Checks if the Json data from which the Method is to be created
 	 * is sufficient, i.e if it contains the mandatory fields, and respects
 	 * the specs
@@ -116,15 +124,12 @@ class Spore {
 	def methodIntegrityCheck(json){
 
 		Map errors=[:]
-		List requiredParams = json['required_params']?:[]
-		List optionalParams = json['optional_params']?:[]
-		def mandatoryFields=spore.Method.declaredFields.findAll {
-			Mandatory in it.declaredAnnotations*.annotationType()
-		}*.name
-		if (!requiredParams.disjoint(optionalParams)){
+		List required = json['required_params']?:[]
+		List optional = json['optional_params']?:[]
+		if (!required.disjoint(optional)){
 			errors["params"]="params cannot be optional and mandatory at the same time found in ${json['name']}"
 		}
-		(mandatoryFields-"api_base_url").each {requiredField->
+		(methodMandatoryFields-"api_base_url").each {requiredField->
 			if (!json.find{k,v->
 				k==requiredField
 			}){

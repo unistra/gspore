@@ -23,7 +23,7 @@ class TestMethodPayload extends GroovyTestCase {
 			]
 		]
 	])
-	Method m =z.createMethod(["name":"requiringPayloadMethod","path":"/path","method":"method","required_payload":true])
+	Method m =z.createMethod(["name":"requiringPayloadMethod","path":"/path","method":"method","required_payload":true])[0]
 	@Test 
 	void testPayloadError(){
 		def message = ""
