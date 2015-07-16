@@ -55,13 +55,13 @@ class Spore {
 				 *is dynamically added to the Spore 
 				 *If no Method could be created, nothing happens.
 				 **/
-				add(*createMethod(methodArgumentsMap(name,value)))
+				add(*createMethod(arguments(name,value)))
 			}catch (MethodError me){
 				throw new MethodError(me)
 			}
 		}
 	}
-	def methodArgumentsMap(methodName,args){
+	def arguments(methodName,args){
 		[
 			name:methodName,
 			/**Inherited from spore if not specified in the parsed Json*/
