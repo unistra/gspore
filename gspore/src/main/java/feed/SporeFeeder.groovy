@@ -13,9 +13,7 @@ class SporeFeeder {
 	 * slurp the Json into a Spore constructor
 	 */
 	public static Spore feed(spec_uri,base_url=null){
-		
 		Map api_description = spec_uri.startsWith('http')?feedFromUrl(spec_uri):feedFromJson(spec_uri)
-		
 		if (!api_description["base_url"] || base_url){
 			
 			api_description["base_url"]=base_url

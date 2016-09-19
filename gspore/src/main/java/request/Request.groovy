@@ -88,7 +88,7 @@ class Request {
 		def callbacks = args['success'].inject({it}){prev,next->
 			prev<<next
 		}
-		
+		//bon ici t'as un truc à faire relatif aux enhabled Paginators client scope.
 		ret['data']=callbacks(ret['data'])?:""
 		return ret
 	}
