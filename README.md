@@ -32,8 +32,12 @@ errors or a Spore.
 7. A response is returned to the client.
 
 
+Install
+-------
 
-
+* git clone https://github.com/unistra/gspore.git
+* cd gspore
+* mvn install
 
 
 SPORE CLIENT 
